@@ -1,0 +1,28 @@
+@font-face {
+	font-family: "FontAwesome";
+	src: url(fonts/BlackFriday.otf);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "FontAwesome";
+  font-size: 0.9rem;
+}
+
+td {
+    align-items: center;
+}
+
+.bg-purple { background-color: #6f42c1; }
+
+#footer {
+	position: fixed;
+  left: 0;
+  bottom: 0;
+	width: 100%;
+}
+
+.label {
+	padding: 8px;
+}

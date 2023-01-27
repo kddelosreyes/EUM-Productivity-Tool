@@ -1,0 +1,265 @@
+package com.project.eum.prodtool.servlet;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.project.eum.prodtool.model.Activity;
+import com.project.eum.prodtool.model.Analyst;
+import com.project.eum.prodtool.model.AnalystActivity;
+import com.project.eum.prodtool.model.Attendance;
+import com.project.eum.prodtool.model.ShiftSchedule;
+import com.project.eum.prodtool.model.add.TimeSummary;
+import com.project.eum.prodtool.model.field.ActivityField;
+import com.project.eum.prodtool.model.field.AnalystField;
+import com.project.eum.prodtool.service.ActivityService;
+import com.project.eum.prodtool.service.AnalystActivityService;
+import com.project.eum.prodtool.service.AttendanceService;
+import com.project.eum.prodtool.service.ShiftScheduleService;
+
+/**
+ * @author khdelos
+ *
+ */
+/**
+ * Servlet implementation class HomeServlet
+ */
+@WebServlet("/HomeServlet")
+public class HomeServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	private final ActivityService activityService = new ActivityService();
+	private final AnalystActivityService analystActivityService = new AnalystActivityService();
+	private final AttendanceService attendanceService = new AttendanceService();
+	private final ShiftScheduleService shiftScheduleService = new ShiftScheduleService();
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public HomeServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		
+		HttpSession session = request.getSession(false);
+		
+		System.out.println(session == null);
+		if (session == null || session.getAttribute("analyst") == null) {
+			response.setHeader("Pragma", "no-cache");
+			response.setHeader("Cache-Control", "no-store");
+			response.setHeader("Expires", "0");
+			response.setDateHeader("Expires", -1);
+			response.sendRedirect(request.getContextPath() + "/");
+		} else {
+			
+			String command = request.getParameter("command");
+			
+			if (command == null || command.equals("LOGIN")) {
+				command = "DEFAULT";
+			}
+			
+			switch (command) {
+			case "DEFAULT":
+				defaultAction(request, response);
+				break;
+			case "START_ACTIVITY":
+				startActivity(request, response);
+				break;
+			case "END_ACTIVITY":
+				endActivity(request, response);
+				break;
+			case "VIEW_ACTIVITY":
+				viewActivity(request, response);
+				break;
+			case "TIME_OUT":
+				timeOut(request, response);
+				break;
+			default:
+				defaultAction(request, response);
+			}
+		}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+	
+	protected void defaultAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		
+		System.out.println(session == null);
+		if (session == null) {
+			response.sendRedirect(request.getContextPath() + "/login");
+		} else {
+			Analyst analyst = (Analyst) session.getAttribute("analyst");
+			
+			if (analyst == null) {
+				if (session != null) {
+					session.invalidate();
+				}
+				response.sendRedirect(request.getContextPath() + "/login");
+			} else {
+				System.out.println("Analyst Id: " + analyst.getId());
+				
+				try {
+					List<Activity> activities = activityService.getActivitiesByAnalystId((Integer) analyst.get(AnalystField.ID));
+					request.setAttribute("activities", activities);
+					
+					Integer analystId = (Integer) analyst.get(AnalystField.ID);
+					List<AnalystActivity> analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
+					Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
+					
+					System.out.println(analystActivities);
+					
+					long totalWorkingMinutes = analystActivities.stream()
+							.mapToLong(a -> a.getMinutes()).sum();
+					
+					long totalProductiveMinutes = analystActivities.stream()
+							.filter(a -> a.getActivity().getActivityTypeId() == 1)
+							.mapToLong(a -> a.getMinutes()).sum();
+					
+					long totalNeutralMinutes = analystActivities.stream()
+							.filter(a -> a.getActivity().getActivityTypeId() == 2)
+							.mapToLong(a -> a.getMinutes()).sum();
+					
+					long totalNonProductiveMinutes = analystActivities.stream()
+							.filter(a -> a.getActivity().getActivityTypeId() == 2)
+							.mapToLong(a -> a.getMinutes()).sum();
+					
+					TimeSummary timeSummary = new TimeSummary();
+					timeSummary.setTotalWork(totalWorkingMinutes);
+					timeSummary.setTotalProductive(totalProductiveMinutes);
+					timeSummary.setTotalNeutral(totalNeutralMinutes);
+					timeSummary.setTotalNonProductive(totalNonProductiveMinutes);
+					
+					Attendance attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);
+					
+					AnalystActivity analystActivity = analystActivities
+							.stream()
+							.filter(a -> a.getEndTime() == null)
+							.findAny()
+							.orElse(null);
+					
+					boolean hasPending = analystActivity != null;
+					
+					ShiftSchedule shiftSchedule = (ShiftSchedule) shiftScheduleService.getShiftScheduleByAnalystId(analystId);
+					
+					request.setAttribute("analyst_activities", analystActivities);
+					request.setAttribute("is_any_pending", isAnyPending);
+					request.setAttribute("time_summary", timeSummary);
+					request.setAttribute("attendance", attendance);
+					request.setAttribute("has_pending", hasPending);
+					request.setAttribute("shift_schedule", shiftSchedule);
+					
+					RequestDispatcher dispatcher = request.getRequestDispatcher("common/views/home.jsp");
+					dispatcher.forward(request, response);
+				} catch (SQLException exc) {
+					exc.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	protected void startActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
+		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
+		
+		try {
+			HttpSession session = request.getSession(false);
+			if (session.getAttribute("record_inserted_successfully") == null) {				
+				Activity activity = (Activity) activityService.getEntityById(activityId);
+				
+				int returnedKey = analystActivityService.insertNewAnalystActivity(analystId, activityId);
+				
+				if (returnedKey == -1) {
+					throw new SQLException("Affected rows = 0");
+				} else {					
+					int activityTypeId = (Integer) activity.get(ActivityField.ACTIVITY_TYPE_ID);
+					if (activityTypeId == 1) {
+						session.setAttribute("record_inserted_successfully", "true");
+						session.setAttribute("inserted_id", returnedKey);
+						
+						System.out.println("Affected Rows: " + returnedKey);
+						request.setAttribute("analyst_activity_id", returnedKey);
+						request.setAttribute("is_new", true);
+						
+						RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
+						dispatcher.forward(request, response);
+					} else {
+						response.sendRedirect(request.getContextPath() + "/home");
+					}
+				}
+			} else {
+				Integer analystActivityId = (Integer) session.getAttribute("inserted_id");
+				request.setAttribute("analyst_activity_id", analystActivityId);
+				
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
+				dispatcher.forward(request, response);
+			}
+		} catch (SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	protected void endActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer analystActivityId = Integer.parseInt(request.getParameter("analyst_activity_id"));
+		
+		try {
+			int affectedRows = analystActivityService.updateAnalystActivityEndTimeById(analystActivityId);
+			
+			if (affectedRows == 0) {
+				throw new SQLException("Affected rows = 0");
+			} else {
+				System.out.println("Affected Rows: " + affectedRows);
+				response.sendRedirect(request.getContextPath() + "/home");
+			}
+		} catch (SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	protected void viewActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer analystActivityId = Integer.parseInt(request.getParameter("analyst_activity_id"));
+		
+		request.setAttribute("analyst_activity_id", analystActivityId);
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
+		dispatcher.forward(request, response);
+	}
+	
+	protected void timeOut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer attendanceId = Integer.parseInt(request.getParameter("attendance_id"));
+		
+		try {
+			int affectedRows = attendanceService.updateAnalystAttendance(attendanceId);
+			
+			if (affectedRows == 0) {
+				throw new SQLException("Affected rows = 0");
+			} else {
+				System.out.println("Affected Rows: " + affectedRows);
+				response.sendRedirect(request.getContextPath() + "/home");
+			}
+		} catch (SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+
+}

@@ -1,0 +1,49 @@
+package com.project.eum.prodtool.service;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+
+import com.project.eum.prodtool.base.Entity;
+import com.project.eum.prodtool.base.Service;
+import com.project.eum.prodtool.model.AnalystLogin;
+import com.project.eum.prodtool.model.field.AnalystLoginField;
+import com.project.eum.prodtool.service.constants.Table;
+import com.project.eum.prodtool.utils.DateTimeUtils;
+
+public class AnalystLoginService extends Service {
+
+	@Override
+	public String getTableName() {
+		return Table.ANALYST_LOGIN.toString();
+	}
+	
+	@Override
+	public Entity getResultSetEntity(ResultSet resultSet) throws SQLException {
+		Integer id = resultSet.getInt("id");
+		Integer analystId = resultSet.getInt("analyst_id");
+		String username = resultSet.getString("username");
+		String password = resultSet.getString("password");
+		String salt = resultSet.getString("salt");
+		LocalDateTime createdDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp("created_date"));
+		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp("updated_date"));
+		Boolean isLocked = resultSet.getInt("is_locked") == 1;
+		Integer attempt = resultSet.getInt("attempt");
+		String uuid = resultSet.getString("uuid");
+		
+		Entity entity = new AnalystLogin()
+				.set(AnalystLoginField.ID, id)
+				.set(AnalystLoginField.ANALYST_ID, analystId)
+				.set(AnalystLoginField.USERNAME, username)
+				.set(AnalystLoginField.PASSWORD, password)
+				.set(AnalystLoginField.SALT, salt)
+				.set(AnalystLoginField.CREATED_DATE, createdDate)
+				.set(AnalystLoginField.UPDATED_DATE, updatedDate)
+				.set(AnalystLoginField.IS_LOCKED, isLocked)
+				.set(AnalystLoginField.ATTEMPT, attempt)
+				.set(AnalystLoginField.UUID, uuid);
+		
+		return entity;
+	}
+	
+}
