@@ -35,8 +35,6 @@ public class TeamService extends Service {
 				.set(TeamField.updatedDate, updateddate);
 		
 		return team;
-	}
-
-	
+	}	
 	
 }

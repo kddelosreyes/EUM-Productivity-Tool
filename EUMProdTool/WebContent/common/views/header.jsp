@@ -34,6 +34,16 @@
 						data-bs-display="static" aria-expanded="false">Welcome, ${analyst.firstName}!</button>
 					<ul class="dropdown-menu dropdown-menu-lg-end"">
 						<li>
+							<a href="#" class="dropdown-item">
+								<i class="bi bi-person"></i> My Profile
+							</a>
+						</li>
+						<li>
+							<a href="#" class="dropdown-item">
+								<i class="bi bi-calendar3"></i> My Calendar
+							</a>
+						</li>
+						<li>
 							<a href="${logout}" class="dropdown-item">
 								<i class="bi bi-box-arrow-left"></i> Logout
 							</a>

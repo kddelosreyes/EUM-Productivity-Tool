@@ -39,46 +39,46 @@
 			<div class="collapse navbar-collapse" id="navbarCollapse">
 				<ul class="nav nav-pills me-auto mb-2 mb-md-0">
 					<li class="nav-item" role="presentation">
-						<a class="nav-link active" id="pills-home"
+						<button class="nav-link active" id="pills-home"
 							data-bs-toggle="pill" data-bs-target="#pills-home-div"
 							type="button" role="tab" aria-controls="pills-home-div"
-							aria-selected="false"><i class="bi bi-house"></i> Home</a>
+							aria-selected="false"><i class="bi bi-house"></i> Home</button>
 					</li>
 					<li class="nav-item" role="presentation">
-						<a class="nav-link" id="pills-entities-analysts"
+						<button class="nav-link" id="pills-entities-activities"
 							data-bs-toggle="pill" data-bs-target="#pills-entities-activities-div"
 							type="button" role="tab" aria-controls="pills-entities-activities-div"
-							aria-selected="false"><i class="bi bi-activity"></i> Activities</a>
+							aria-selected="false"><i class="bi bi-activity"></i> Activities</button>
 					</li>
 					<li>
-						<a class="nav-link" id="pills-entities-analysts"
+						<button class="nav-link" id="pills-entities-analysts"
 							data-bs-toggle="pill" data-bs-target="#pills-entities-analysts-div"
 							type="button" role="tab" aria-controls="pills-entities-analysts-div"
-							aria-selected="false"><i class="bi bi-person"></i> Analysts</a>
+							aria-selected="false"><i class="bi bi-person"></i> Analysts</button>
 					</li>
 					<li>
-						<a class="nav-link" id="pills-entities-teams"
+						<button class="nav-link" id="pills-entities-teams"
 							data-bs-toggle="pill" data-bs-target="#pills-entities-teams-div"
 							type="button" role="tab" aria-controls="pills-entities-teams-div"
-							aria-selected="false"><i class="bi bi-people"></i> Teams</a>
+							aria-selected="false"><i class="bi bi-people"></i> Teams</button>
 					</li>
 					<li>
-						<a class="nav-link" id="pills-attendance-attendance"
+						<button class="nav-link" id="pills-attendance-attendance"
 							data-bs-toggle="pill" data-bs-target="#pills-attendance-attendance-div"
 							type="button" role="tab" aria-controls="pills-attendance-attendance-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar"></i> Attendance</a>
+							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar"></i> Attendance</button>
 					</li>
 					<li>
-						<a class="nav-link" id="pills-attendance-shift-schedule"
+						<button class="nav-link" id="pills-attendance-shift-schedule"
 							data-bs-toggle="pill" data-bs-target="#pills-attendance-shift-schedule-div"
 							type="button" role="tab" aria-controls="pills-attendance-shift-schedule-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-week"></i> Shift Schedule</a>
+							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-week"></i> Shift Schedule</button>
 					</li>
 					<li>
-						<a class="nav-link" id="pills-attendance-leaves"
+						<button class="nav-link" id="pills-attendance-leaves"
 							data-bs-toggle="pill" data-bs-target="#pills-attendance-leaves-div"
 							type="button" role="tab" aria-controls="pills-attendance-leaves-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-x"></i> Leaves</a>
+							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-x"></i> Leaves</button>
 					</li>
 					<li class="nav-item" role="presentation">
 						<button class="nav-link" id="pills-reports"
@@ -124,7 +124,7 @@
 						</div>
 						<div class="tab-pane fade" id="pills-entities-analysts-div" role="tabpanel"
 							aria-labelledby="#pills-entities-analysts" tabindex="0">
-							Entities / Analysts
+							<jsp:include page="_analyst.jsp" />
 						</div>
 						<div class="tab-pane fade" id="pills-entities-teams-div" role="tabpanel"
 							aria-labelledby="#pills-entities-teams" tabindex="0">
@@ -214,6 +214,9 @@
 			if (jsLastPage === 'REPORT') {
 				$("#pills-reports").click();
 				showSuccessMessage(jsMessage);
+			} else if (jsLastPage === 'ANALYST') {
+				$("#pills-entities-analysts").click();
+				showSuccessMessage(jsMessage);
 			}
 			
 			<%
@@ -229,6 +232,88 @@
 				"bFilter" : false
 			});
 			
+			/*
+			 * Analysts
+			 */
+			$('#analysts_table').DataTable({
+				"ordering" : false
+			});
+			
+			clearField($('#analyst_first_name'));
+			clearField($('#analyst_last_name'));
+			clearField($('#analyst_role'));
+			clearField($('#analyst_email'));
+			
+			$("#save_analyst").click(function() {
+				var firstNameField = $('#analyst_first_name');
+				var lastNameField = $('#analyst_last_name');
+				var roleField = $('#analyst_role');
+				var emailField = $('#analyst_email');
+				
+				var isValidFirstName = isValid(firstNameField);
+				var isValidLastName = isValid(lastNameField);
+				var isValidRole = isValid(roleField);
+				var isValidEmail = isValid(emailField);
+				
+				var middleName = "";
+				if ($('#analyst_middle_initial')) {
+					middleName = $('#analyst_middle_initial').val();
+				}
+				
+				if (isValidFirstName && isValidLastName && isValidRole && isValidEmail) {
+					$.ajax({
+						type : "POST",
+						url : "manage",
+						data : {
+							command : "CREATE_ANALYST",
+							first_name : firstNameField.val(),
+							middle_name : middleName,
+							last_name: lastNameField.val(),
+							role : roleField.val(),
+							email : emailField.val()
+						},
+						success : function(responseText) {
+							window.location.href = "http://localhost:8080/EUMProdTool/manage";
+				        }
+					});
+				}
+			});
+			
+	        $('#analysts_table').on('click', 'button.edit_analyst',function (ele) {
+	        	console.log('Clicked.');
+	            //the <tr> variable is use to set the parentNode from "ele
+	            var tr = ele.target.parentNode.parentNode.parentNode;
+
+	            //I get the value from the cells (td) using the parentNode (var tr)
+	            var firstName = tr.cells[0].textContent;
+	            var middleInitial = tr.cells[1].textContent;
+	            var lastName = tr.cells[2].textContent;
+	            var role = tr.cells[3].textContent;
+	            var email = tr.cells[4].textContent;
+
+	            $('#analyst_first_name').val(firstName);
+				$('#analyst_last_name').val(lastName);
+				$('#analyst_middle_initial').val(middleInitial);
+				$('#analyst_role').val(role);
+				$('#analyst_email').val(email);
+				$("#analyst_email").prop('disabled', true);
+	        });
+			
+	        $('#create_new_analyst').on('hidden.bs.modal', function (e) {
+	        	clearField($('#analyst_first_name'));
+				clearField($('#analyst_last_name'));
+				clearField($('#analyst_role'));
+				clearField($('#analyst_email'));
+				
+				$("#analyst_email").prop('disabled', false);
+				
+				$('#analyst_first_name').val('');
+				$('#analyst_middle_initial').val('');
+				$('#analyst_last_name').val('');
+				$('#analyst_role').val('');
+				$('#analyst_email').val('');
+	        });
+	        
 			/*
 			 *	Activity
 			 */
@@ -445,11 +530,11 @@
 			
 			function isValid(f) {
 				var isValid = false;
-				if (f.val() === '') {
-					addClass(f, "is-invalid");
-				} else {
+				if (f.val()) {
 					removeClass(f, "is-invalid");
 					isValid = true;
+				} else {
+					addClass(f, "is-invalid");
 				}
 				return isValid;
 			}

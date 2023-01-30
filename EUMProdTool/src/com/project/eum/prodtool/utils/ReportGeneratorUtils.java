@@ -6,7 +6,9 @@ import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,8 +80,10 @@ public class ReportGeneratorUtils {
 				generateProductivityReport(request, response, report, reportQueries);
 				break;
 			case REPORT_ACTIVITY:
+				generateActivityReport(request, response, report, reportQueries);
 				break;
 			case REPORT_LEAVES:
+				generateLeavesReport(request, response, report, reportQueries);
 				break;
 		}
 	}
@@ -300,16 +304,225 @@ public class ReportGeneratorUtils {
 			for (Entity analystEntity : activeAnalysts) {
 				Analyst analyst = (Analyst) analystEntity;
 				
-				Map<LocalDate, String> attendance = productivityMap.get(analyst);
+				Map<LocalDate, String> productivity = productivityMap.get(analyst);
 				List<String> remarks = new ArrayList<>();
 				
 				for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
 					final LocalDate currentDate = date;
-					remarks.add(attendance.get(currentDate));
+					remarks.add(productivity.get(currentDate));
 				}
 				String fullName = analyst.getFirstName() + " " + analyst.getLastName();
 				data.put(rowNumber, createRow(rowNumber, fullName, remarks));
 				rowNumber++;
+			}
+			
+			generateExcelFile(request, response, report, data);
+		} catch (SQLException | IOException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	private static void generateActivityReport(HttpServletRequest request, HttpServletResponse response, Report report, List<ReportQuery> reportQueries) {
+		try {
+			ReportService reportService = new ReportService();
+			AnalystService analystService = new AnalystService();
+			AnalystActivityService analystActivityService = new AnalystActivityService();
+			
+			String analystsQuery = reportQueries.get(0).getQuery();
+			ResultSet analystResult = reportService.getDataFromQuery(analystsQuery, report.getTeamId());
+			
+			List<Entity> activeAnalysts = new ArrayList<>();
+			while (analystResult.next()) {
+				activeAnalysts.add(analystService.getResultSetEntity(analystResult));
+			}
+			System.out.println(activeAnalysts);
+			
+			String analystActivityQuery = reportQueries.get(1).getQuery();
+			ResultSet activityResult = reportService.getDataFromQuery(
+					analystActivityQuery,
+					DateTimeUtils.toSqlDateString(report.getFromDate()),
+					DateTimeUtils.toSqlDateString(report.getToDate()),
+					report.getTeamId());
+			
+			List<Entity> activities = new ArrayList<>();
+			while (activityResult.next()) {
+				activities.add(analystActivityService.getResultSetEntity(activityResult));
+			}
+			System.out.println(activities);
+			
+			Map<Analyst, Map<LocalDate, List<Entity>>> activityMap = new HashMap<>();
+			
+			LocalDate startDate = report.getFromDate(), endDate = report.getToDate();
+			for (Entity analystEntity : activeAnalysts) {
+				Analyst analyst = (Analyst) analystEntity;
+				
+				List<Entity> analystActivities = activities.stream()
+						.filter(activity -> ((AnalystActivity) activity).getAnalystId() == analyst.getId())
+						.collect(Collectors.toList());
+				
+				if (!analystActivities.isEmpty()) {
+					Map<LocalDate, List<Entity>> activityRemarks = new HashMap<>();
+					for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+						final LocalDate currentDate = date;
+						
+						List<Entity> todaysActivities = analystActivities.stream()
+								.filter(a -> ((AnalystActivity) a).getStartTime().toLocalDate().equals(currentDate))
+								.collect(Collectors.toList());
+						
+						if (!todaysActivities.isEmpty()) {
+							activityRemarks.put(currentDate, todaysActivities);
+						} else {
+							activityRemarks.put(currentDate, null);
+						}
+					}
+					
+					activityMap.put(analyst, activityRemarks);
+				}
+			}
+			
+			Map<Integer, Object[]> data = new TreeMap<Integer, Object[]>();
+			
+			// Create row for title
+			List<String> dates = new ArrayList<>();
+			for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+				dates.add(date.toString());
+			}
+			data.put(0, createRow("", "Name", "Activity", "Type", "Date", "Start Time", "End Time", "Minutes"));
+			
+			// Create rows for the contents
+			int rowNumber = 1;
+			for (Entity analystEntity : activeAnalysts) {
+				Analyst analyst = (Analyst) analystEntity;
+				
+				Map<LocalDate, List<Entity>> activityRemarks = activityMap.get(analyst);
+				
+				if (activityRemarks != null) {
+					String fullName = analyst.getFirstName() + " " + analyst.getLastName();
+					
+					for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+						final LocalDate currentDate = date;
+						List<Entity> analystActivities = activityRemarks.get(currentDate);
+						
+						if (analystActivities != null) {
+							for (Entity activityEntity : analystActivities) {
+								AnalystActivity analystActivity = (AnalystActivity) activityEntity;
+								LocalDateTime startTime = analystActivity.getStartTime();
+								LocalDateTime endTime = analystActivity.getEndTime();
+								
+								data.put(rowNumber,
+										createRow(rowNumber,
+												fullName,
+												analystActivity.getActivity().getName(),
+												analystActivity.getActivity().getActivityType().getType(),
+												startTime.toLocalDate().format(DateTimeFormatter.ofPattern("YYYY-MM-DD")),
+												startTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm a")),
+												endTime == null ? "NTO" : analystActivity.getEndTime().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm a")),
+												DateTimeUtils.minutesInBetween(startTime, endTime)
+												)
+										);
+								rowNumber++;
+							}
+						}
+					}
+				}
+			}
+			
+			generateExcelFile(request, response, report, data);
+		} catch (SQLException | IOException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	private static void generateLeavesReport(HttpServletRequest request, HttpServletResponse response, Report report, List<ReportQuery> reportQueries) {
+		try {
+			ReportService reportService = new ReportService();
+			AnalystService analystService = new AnalystService();
+			AttendanceService attendanceService = new AttendanceService();
+			
+			String analystsQuery = reportQueries.get(0).getQuery();
+			ResultSet analystResult = reportService.getDataFromQuery(analystsQuery, report.getTeamId());
+			
+			List<Entity> activeAnalysts = new ArrayList<>();
+			while (analystResult.next()) {
+				activeAnalysts.add(analystService.getResultSetEntity(analystResult));
+			}
+			System.out.println(activeAnalysts);
+			
+			String attendanceQuery = reportQueries.get(1).getQuery();
+			ResultSet attendanceResult = reportService.getDataFromQuery(
+					attendanceQuery,
+					DateTimeUtils.toSqlDateString(report.getFromDate()),
+					DateTimeUtils.toSqlDateString(report.getToDate()),
+					report.getTeamId());
+			
+			List<Entity> leaves = new ArrayList<>();
+			while (attendanceResult.next()) {
+				leaves.add(attendanceService.getResultSetEntity(attendanceResult));
+			}
+			System.out.println(leaves);
+			
+			Map<Analyst, Map<LocalDate, Attendance>> leavesMap = new HashMap<>();
+			
+			LocalDate startDate = report.getFromDate(), endDate = report.getToDate();
+			for (Entity analystEntity : activeAnalysts) {
+				Analyst analyst = (Analyst) analystEntity;
+				
+				List<Entity> analystLeaves = leaves.stream()
+						.filter(attendance -> ((Attendance) attendance).getAnalystId() == analyst.getId())
+						.collect(Collectors.toList());
+				
+				if (!analystLeaves.isEmpty()) {
+					Map<LocalDate, Attendance> leaveRemarks = new HashMap<>();
+					for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+						final LocalDate currentDate = date;
+						
+						Entity todayLeave = analystLeaves.stream()
+								.filter(a -> ((Attendance) a).getTimeIn().toLocalDate().equals(currentDate))
+								.findFirst()
+								.orElse(null);
+						
+						leaveRemarks.put(currentDate, (Attendance) todayLeave);
+					}
+					
+					leavesMap.put(analyst, leaveRemarks);
+				}
+			}
+			
+			Map<Integer, Object[]> data = new TreeMap<Integer, Object[]>();
+			
+			// Create row for title
+			List<String> dates = new ArrayList<>();
+			for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+				dates.add(date.toString());
+			}
+			data.put(0, createRow("", "Name", "Date", "Leave Type"));
+			
+			// Create rows for the contents
+			int rowNumber = 1;
+			for (Entity analystEntity : activeAnalysts) {
+				Analyst analyst = (Analyst) analystEntity;
+				
+				Map<LocalDate, Attendance> leaveRemarks = leavesMap.get(analyst);
+				
+				if (leaveRemarks != null) {
+					String fullName = analyst.getFirstName() + " " + analyst.getLastName();
+					
+					for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
+						final LocalDate currentDate = date;
+						Attendance leave = leaveRemarks.get(currentDate);
+						
+						if (leave != null) {
+							data.put(rowNumber,
+									createRow(rowNumber,
+											fullName,
+											leave.getTimeIn().toLocalDate().format(DateTimeFormatter.ofPattern("YYYY-MM-DD")),
+											leaveString(leave.getRemarks().split(" ")[2])
+											)
+									);
+							rowNumber++;
+						}
+					}
+				}
 			}
 			
 			generateExcelFile(request, response, report, data);
@@ -400,6 +613,31 @@ public class ReportGeneratorUtils {
 
 		public String getQuery() {
 			return query;
+		}
+	}
+	
+	private static String leaveString(String leave) {
+		switch(leave) {
+		case "(VL)":
+			return "Vacation Leave";
+		case "(VL-AM)":
+			return "Vacation Leave (AM)";
+		case "(VL-PM)":
+			return "Vacation Leave (PM)";
+		case "(SL)":
+			return "Sick Leave";
+		case "(SL-AM)":
+			return "Sick Leave (AM)";
+		case "(SL-PM)":
+			return "Sick Leave (PM)";
+		case "(EL)":
+			return "Emergency Leave";
+		case "(EL-AM)":
+			return "Emergency Leave (AM)";
+		case "(EL-PM)":
+			return "EmergencyLeave (AM)";
+		default:
+			return "On Leave";
 		}
 	}
 	

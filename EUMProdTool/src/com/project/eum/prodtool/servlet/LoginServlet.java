@@ -21,6 +21,7 @@ import com.project.eum.prodtool.service.AnalystLoginHistoryService;
 import com.project.eum.prodtool.service.AnalystLoginService;
 import com.project.eum.prodtool.service.AnalystService;
 import com.project.eum.prodtool.service.AttendanceService;
+import com.project.eum.prodtool.service.ShiftScheduleService;
 import com.project.eum.prodtool.utils.PasswordUtils;
 
 /**
@@ -40,6 +41,7 @@ public class LoginServlet extends HttpServlet {
 	private final AnalystService analystService = new AnalystService();
 	private final AnalystLoginHistoryService analystLoginHistoryService = new AnalystLoginHistoryService();
 	private final AttendanceService attendanceService = new AttendanceService();
+	private final ShiftScheduleService shiftScheduleService = new ShiftScheduleService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -122,6 +124,7 @@ public class LoginServlet extends HttpServlet {
 				setSessionDetails(session, new Analyst(), new AnalystLogin());
 				response.getWriter().write("MANAGER-LOGIN");
 			} else {
+				username = username + "@indracompany.com";
 				try {
 					Entity entity = analystLoginService.getEntityByColumn(AnalystLoginColumn.USERNAME, username);
 					
@@ -133,18 +136,27 @@ public class LoginServlet extends HttpServlet {
 								(String) analystLogin.get(AnalystLoginField.PASSWORD),
 								(String) analystLogin.get(AnalystLoginField.SALT));
 						if (isVerified) {
-							HttpSession session = request.getSession(false);
 							Integer analystId = (Integer) analystLogin.get(AnalystLoginField.ANALYST_ID);
+							Entity shiftSchedule = shiftScheduleService.getShiftScheduleByAnalystId(analystId);
 							
-							Analyst analyst = (Analyst) analystService.getEntityById(analystId);
-							
-							analystLoginHistoryService.insertNewAnalystLoginHistory((Integer) analystLogin.get(AnalystLoginField.ID));
-							if (!attendanceService.hasAttendanceForToday(analystId)) {
-								attendanceService.insertNewAttendanceForAnalystId(analystId);
+							if (shiftSchedule == null) {
+								response.getWriter().write("No active shift schedule.");
+							} else {
+								if (analystService.hasTeam(analystId)) {
+									HttpSession session = request.getSession(false);
+									Analyst analyst = (Analyst) analystService.getEntityById(analystId);
+									
+									analystLoginHistoryService.insertNewAnalystLoginHistory((Integer) analystLogin.get(AnalystLoginField.ID));
+									if (!attendanceService.hasAttendanceForToday(analystId)) {
+										attendanceService.insertNewAttendanceForAnalystId(analystId);
+									}
+									
+									setSessionDetails(session, analyst, analystLogin);
+									response.getWriter().write("ANALYST-LOGIN");
+								} else {
+									response.getWriter().write("Analyst does not belong to a team.");
+								}
 							}
-							
-							setSessionDetails(session, analyst, analystLogin);
-							response.getWriter().write("ANALYST-LOGIN");
 						} else {
 					        response.getWriter().write("Username and password does not match!");
 						}

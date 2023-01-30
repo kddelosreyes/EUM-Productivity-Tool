@@ -9,7 +9,7 @@
 <html>
 	<div class="card">
 		<div class="card-body">
-			<h5><b>Attendance / Attendance</b></h5>
+			<h5><b>Attendance</b></h5>
 			<br>
 			<table id="attendance_table" class="table table-striped" style="width:100%">
 				<thead>

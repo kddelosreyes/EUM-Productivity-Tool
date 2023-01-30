@@ -14,10 +14,14 @@ import javax.servlet.http.HttpSession;
 
 import com.project.eum.prodtool.model.Report;
 import com.project.eum.prodtool.model.column.ReportColumn;
+import com.project.eum.prodtool.service.AnalystLoginService;
+import com.project.eum.prodtool.service.AnalystService;
 import com.project.eum.prodtool.service.ReportService;
 import com.project.eum.prodtool.utils.DateTimeUtils;
+import com.project.eum.prodtool.utils.PasswordUtils;
 import com.project.eum.prodtool.utils.ReportGeneratorUtils;
 import com.project.eum.prodtool.view.TabDetails_Activity;
+import com.project.eum.prodtool.view.TabDetails_Analyst;
 import com.project.eum.prodtool.view.TabDetails_Attendance;
 import com.project.eum.prodtool.view.TabDetails_Home;
 import com.project.eum.prodtool.view.TabDetails_Report;
@@ -30,6 +34,8 @@ public class ManageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private final ReportService reportService = new ReportService();
+	private final AnalystService analystService = new AnalystService();
+	private final AnalystLoginService analystLoginService = new AnalystLoginService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -72,6 +78,9 @@ public class ManageServlet extends HttpServlet {
 			case "ARCHIVE_REPORT":
 				archiveReport(request, response);
 				break;
+			case "CREATE_ANALYST":
+				createAnalyst(request, response);
+				break;
 			default:
 				defaultAction(request, response);
 			}
@@ -110,6 +119,14 @@ public class ManageServlet extends HttpServlet {
 		 * Activity - End
 		 * */
 		
+		/*
+		 * Activity - Start
+		 * */
+		TabDetails_Analyst analystTabDetails = new TabDetails_Analyst();
+		request.setAttribute("analysts", analystTabDetails.getAnalysts());
+		/*
+		 * Activity - End
+		 * */
 		
 		/*
 		 * Attendance - Start
@@ -181,6 +198,35 @@ public class ManageServlet extends HttpServlet {
 			
 			response.sendRedirect(request.getContextPath() + "/manage");
 		} catch(SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	private void createAnalyst(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String firstName = request.getParameter("first_name");
+			String middleName = request.getParameter("middle_name");
+			String lastName = request.getParameter("last_name");
+			String role = request.getParameter("role");
+			String email = request.getParameter("email");
+			
+			int analystId = analystService.insertNewAnalyst(firstName, middleName, lastName, role);
+			if (analystId > 0) {
+				String salt = PasswordUtils.getSaltvalue(36);
+				String password = PasswordUtils.generateSecurePassword(email, salt);
+				int returnedKey = analystLoginService.insertNewAnalystLogin(analystId, email, password, salt, 0, 0);
+				
+				if (returnedKey > 0) {
+					HttpSession session = request.getSession(false);
+					session.setAttribute("last_page", "ANALYST");
+					session.setAttribute("message", "Analyst successfully created.");
+					
+					System.out.println("Created analyst and account.");
+					
+					response.getWriter().write(Integer.toString(returnedKey));
+				}
+			}
+		} catch (SQLException exc) {
 			exc.printStackTrace();
 		}
 	}

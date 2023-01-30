@@ -3,6 +3,7 @@ package com.project.eum.prodtool.model.field;
 import java.time.LocalDateTime;
 
 import com.project.eum.prodtool.base.EntityField;
+import com.project.eum.prodtool.model.AnalystLogin;
 
 /**
  * @author khdelos
@@ -18,7 +19,8 @@ public enum AnalystField implements EntityField {
 	ROLE("role", String.class),
 	IS_ACTIVE("isActive", Boolean.class),
 	CREATED_DATE("createdDate", LocalDateTime.class),
-	UPDATED_DATE("updatedDate", LocalDateTime.class);
+	UPDATED_DATE("updatedDate", LocalDateTime.class),
+	ANALYST_LOGIN("analystLogin", AnalystLogin.class);
 	
 	private final String fieldName;
 	private final Class<?> dataType;

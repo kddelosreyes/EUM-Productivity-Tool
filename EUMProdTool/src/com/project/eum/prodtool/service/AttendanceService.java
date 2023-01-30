@@ -60,7 +60,8 @@ public class AttendanceService extends Service {
 		Query query = new Query("SELECT * "
 				+ "FROM attendance "
 				+ "WHERE analyst_id = ?1 "
-				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP, '%Y-%m-%d') ");
+				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP, '%Y-%m-%d') "
+				+ "AND remarks = 'REGULAR'");
 		query.params(analystId);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());

@@ -17,6 +17,7 @@ public class Analyst extends Entity {
 	private Boolean isActive;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
+	private AnalystLogin analystLogin;
 	
 	public Analyst() {
 		super();
@@ -70,6 +71,10 @@ public class Analyst extends Entity {
 
 	public LocalDateTime getUpdatedDate() {
 		return updatedDate;
+	}
+	
+	public AnalystLogin getAnalystLogin() {
+		return analystLogin;
 	}
 	
 }

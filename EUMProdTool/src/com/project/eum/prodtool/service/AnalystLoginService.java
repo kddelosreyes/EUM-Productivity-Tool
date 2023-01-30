@@ -46,4 +46,16 @@ public class AnalystLoginService extends Service {
 		return entity;
 	}
 	
+	public Integer insertNewAnalystLogin(Integer analystId, String username, String password,
+			String salt, Integer isLocked, Integer attempt) throws SQLException {
+		String sqlQuery = "INSERT INTO " + getTableName() + "(analyst_id, username, password, salt, is_locked, attempt, uuid) "
+				+ "VALUES(?1, ?2, ?3, ?4, ?5, ?6, uuid())";
+		
+		Query query = new Query(sqlQuery);
+		query.params(analystId, username, password, salt, isLocked, attempt);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
 }

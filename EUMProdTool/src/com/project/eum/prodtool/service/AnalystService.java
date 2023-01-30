@@ -7,13 +7,17 @@ import java.time.LocalDateTime;
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.base.Service;
 import com.project.eum.prodtool.model.Analyst;
+import com.project.eum.prodtool.model.AnalystLogin;
 import com.project.eum.prodtool.model.column.AnalystColumn;
+import com.project.eum.prodtool.model.column.AnalystLoginColumn;
 import com.project.eum.prodtool.model.field.AnalystField;
 import com.project.eum.prodtool.service.constants.Table;
 import com.project.eum.prodtool.utils.DateTimeUtils;
 
 public class AnalystService extends Service {
 
+	private final AnalystLoginService analystLoginService = new AnalystLoginService();
+	
 	@Override
 	public String getTableName() {
 		return Table.ANALYST.toString();
@@ -31,6 +35,8 @@ public class AnalystService extends Service {
 		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AnalystColumn.UPDATED_DATE.getColumnName()));
 		String uuid = resultSet.getString(AnalystColumn.UUID.getColumnName());
 		
+		AnalystLogin analystLogin = (AnalystLogin) analystLoginService.getEntityByColumn(AnalystLoginColumn.ANALYST_ID, id);
+		
 		Entity entity = new Analyst()
 				.set(AnalystField.ID, id)
 				.set(AnalystField.FIRST_NAME, firstName)
@@ -40,10 +46,33 @@ public class AnalystService extends Service {
 				.set(AnalystField.IS_ACTIVE, isActive)
 				.set(AnalystField.CREATED_DATE, createdDate)
 				.set(AnalystField.UPDATED_DATE, updatedDate)
-				.set(AnalystField.UUID, uuid);
+				.set(AnalystField.UUID, uuid)
+				.set(AnalystField.ANALYST_LOGIN, analystLogin);
 		
 		return entity;
 	}
 	
+	public Integer insertNewAnalyst(String firstName, String middleName, String lastName,
+			String role) throws SQLException {
+		String sqlQuery = "INSERT INTO " + getTableName() + "(first_name, middle_name, last_name, role, is_active, uuid) "
+				+ "VALUES(?1, ?2, ?3, ?4, 1, uuid())";
+		
+		Query query = new Query(sqlQuery);
+		query.params(firstName, middleName, lastName, role);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
+	public Boolean hasTeam(Integer analystId) throws SQLException {
+		String sql = "SELECT count(*) FROM analyst_team ant JOIN analyst a ON a.id = ant.analyst_id where a.id = ?1";
+		
+		Query query = new Query(sql);
+		query.params(analystId);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		resultSet.next();
+		return resultSet.getInt(1) > 0;
+	}
 	
 }
