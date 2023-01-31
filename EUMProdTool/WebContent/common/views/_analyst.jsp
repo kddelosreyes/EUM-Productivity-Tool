@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="analysts_table" class="table table-striped" style="width:100%">
+					<table id="analysts_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>First Name</th>
@@ -53,7 +53,12 @@
 									</td>
 									<td>
 										<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>
-										<a href="#" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
+										<c:if test="${analyst.isActive}">
+											<a href="#" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
+										</c:if>
+										<c:if test="${not analyst.isActive}">
+											<a href="#" class="btn btn-outline-success btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Activate"><i class="bi bi-unlock"></i></a>
+										</c:if>
 									</td>
 								</tr>
 							</c:forEach>

@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activity_types_table" class="table table-striped" style="width:100%">
+					<table id="activity_types_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>Id</th>
@@ -66,7 +66,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activities_table" class="display" style="width:100%">
+					<table id="activities_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>Id</th>
@@ -115,7 +115,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="fields_table" class="table table-striped" style="width:100%">
+					<table id="fields_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>Id</th>
@@ -167,7 +167,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activity_field_map_table" class="table table-striped" style="width:100%">
+					<table id="activity_field_map_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>Id</th>

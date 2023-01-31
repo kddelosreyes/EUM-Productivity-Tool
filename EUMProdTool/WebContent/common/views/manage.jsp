@@ -128,7 +128,7 @@
 						</div>
 						<div class="tab-pane fade" id="pills-entities-teams-div" role="tabpanel"
 							aria-labelledby="#pills-entities-teams" tabindex="0">
-							Entities / Teams
+							<jsp:include page="_team.jsp" />
 						</div>
 						<div class="tab-pane fade" id="pills-attendance-attendance-div" role="tabpanel"
 							aria-labelledby="#pills-attendance-attendance" tabindex="0">
@@ -229,6 +229,7 @@
 			 */
 			$('#attendance_table').DataTable({
 				"ordering" : false,
+				autoWidth : true,
 				"bFilter" : false
 			});
 			
@@ -236,7 +237,8 @@
 			 * Analysts
 			 */
 			$('#analysts_table').DataTable({
-				"ordering" : false
+				"ordering" : false,
+				autoWidth : true
 			});
 			
 			clearField($('#analyst_first_name'));
@@ -319,6 +321,7 @@
 			 */
 			$('#activity_types_table').DataTable({
 				"ordering" : false,
+				autoWidth : true,
 				"bFilter" : false
 			});
 			
@@ -348,7 +351,8 @@
 			});
 			
 			$('#fields_table').DataTable({
-				"ordering" : false
+				"ordering" : false,
+				autoWidth : true
 			});
 			
 			$('#activity_field_map_table').DataTable({
@@ -377,6 +381,24 @@
 			});
 			
 			/*
+			 *	Team
+			 */
+			$('#teams_table').DataTable({
+				"ordering" : false,
+				autoWidth : true
+			});
+			
+			$('#analyst_team_table').DataTable({
+				"ordering" : false,
+				autoWidth : true
+			});
+			
+			$('#team_activity_table').DataTable({
+				"ordering" : false,
+				autoWidth : true
+			});
+			
+			/*
 			 *	Report
 			 */
 			$("#report_start_date").datepicker();
@@ -391,8 +413,7 @@
 			
 			$('#reports_table').DataTable({
 				"ordering" : false,
-				autoWidth : true,
-		        fixedHeader: true
+				autoWidth : true
 			});
 			
 			$("#generate_report").click(function() {

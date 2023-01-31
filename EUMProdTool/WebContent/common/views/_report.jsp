@@ -90,7 +90,7 @@
 				</div>
 			</div>
 			<br><br>
-			<table id="reports_table" class="table table-striped" style="width:100%">
+			<table id="reports_table" class="table table-striped nowrap" style="width:100%">
 				<thead>
 					<tr>
 						<th>Name</th>

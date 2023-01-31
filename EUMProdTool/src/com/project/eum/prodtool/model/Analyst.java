@@ -18,6 +18,7 @@ public class Analyst extends Entity {
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	private AnalystLogin analystLogin;
+	private String name;
 	
 	public Analyst() {
 		super();
@@ -75,6 +76,10 @@ public class Analyst extends Entity {
 	
 	public AnalystLogin getAnalystLogin() {
 		return analystLogin;
+	}
+	
+	public String getName() {
+		return firstName + " " + lastName;
 	}
 	
 }

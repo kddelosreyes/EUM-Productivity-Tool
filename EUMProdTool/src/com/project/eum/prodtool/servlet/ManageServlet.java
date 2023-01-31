@@ -25,6 +25,7 @@ import com.project.eum.prodtool.view.TabDetails_Analyst;
 import com.project.eum.prodtool.view.TabDetails_Attendance;
 import com.project.eum.prodtool.view.TabDetails_Home;
 import com.project.eum.prodtool.view.TabDetails_Report;
+import com.project.eum.prodtool.view.TabDetails_Team;
 
 /**
  * Servlet implementation class Manage
@@ -120,12 +121,23 @@ public class ManageServlet extends HttpServlet {
 		 * */
 		
 		/*
-		 * Activity - Start
+		 * Analyst - Start
 		 * */
 		TabDetails_Analyst analystTabDetails = new TabDetails_Analyst();
 		request.setAttribute("analysts", analystTabDetails.getAnalysts());
 		/*
-		 * Activity - End
+		 * Analyst - End
+		 * */
+		
+		/*
+		 * Team - Start
+		 * */
+		TabDetails_Team teamTabDetails = new TabDetails_Team();
+		request.setAttribute("teams", teamTabDetails.getTeams());
+		request.setAttribute("analyst_teams", teamTabDetails.getAnalystTeams());
+		request.setAttribute("team_activities", teamTabDetails.getActivityTeams());
+		/*
+		 * Team - End
 		 * */
 		
 		/*
@@ -214,7 +226,7 @@ public class ManageServlet extends HttpServlet {
 			if (analystId > 0) {
 				String salt = PasswordUtils.getSaltvalue(36);
 				String password = PasswordUtils.generateSecurePassword(email, salt);
-				int returnedKey = analystLoginService.insertNewAnalystLogin(analystId, email, password, salt, 0, 0);
+				int returnedKey = analystLoginService.insertNewAnalystLogin(analystId, email, password, salt, 1, 0);
 				
 				if (returnedKey > 0) {
 					HttpSession session = request.getSession(false);
