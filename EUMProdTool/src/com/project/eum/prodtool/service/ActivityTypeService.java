@@ -30,5 +30,15 @@ public class ActivityTypeService extends Service {
 		
 		return entity;
 	}
+	
+	public Integer insertNewActivityType(String name) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + " (type, uuid) "
+				+ "VALUES (?1, uuid())";
+		Query query = new Query(sql);
+		query.params(name);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
 
 }

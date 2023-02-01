@@ -1,7 +1,6 @@
 package com.project.eum.prodtool.servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,7 +32,7 @@ import com.project.eum.prodtool.utils.PasswordUtils;
  */
 
 @WebServlet("/LoginServlet")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet extends AppServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private final ActivityService activityService = new ActivityService();
@@ -170,8 +169,8 @@ public class LoginServlet extends HttpServlet {
 					        response.getWriter().write("Username and password does not match!");
 						}
 					}
-				} catch(SQLException exception) {
-					exception.printStackTrace();
+				} catch(Exception exception) {
+					handleException(request, response, exception, false);
 				}
 			}
 		}

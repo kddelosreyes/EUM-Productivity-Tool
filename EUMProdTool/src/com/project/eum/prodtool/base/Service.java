@@ -8,8 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mysql.cj.jdbc.exceptions.CommunicationsException;
-
 /**
  * @author khdelos
  *
@@ -35,7 +33,7 @@ public abstract class Service {
             try {
             	Class.forName("com.mysql.cj.jdbc.Driver"); 
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            } catch (CommunicationsException | ClassNotFoundException exc) {
+            } catch (ClassNotFoundException exc) {
             	exc.printStackTrace();
             }
         }

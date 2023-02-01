@@ -24,6 +24,10 @@
     <servlet-name>ChangePasswordServlet</servlet-name>
     <servlet-class>com.project.eum.prodtool.servlet.ChangePasswordServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>ErrorServlet</servlet-name>
+    <servlet-class>com.project.eum.prodtool.servlet.ErrorServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
@@ -43,6 +47,10 @@
   <servlet-mapping>
     <servlet-name>ChangePasswordServlet</servlet-name>
     <url-pattern>/changepassword</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ErrorServlet</servlet-name>
+    <url-pattern>/error</url-pattern>
   </servlet-mapping>
   <session-config>
     <session-timeout>15</session-timeout>

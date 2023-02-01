@@ -218,6 +218,9 @@
 			} else if (jsLastPage === 'ANALYST') {
 				$("#pills-entities-analysts").click();
 				showSuccessMessage(jsMessage);
+			} else if (jsLastPage === 'ACTIVITY') {
+				$("#pills-entities-activities").click();
+				showSuccessMessage(jsMessage);
 			}
 			
 			<%
@@ -276,7 +279,11 @@
 							email : emailField.val()
 						},
 						success : function(responseText) {
-							window.location.href = "http://localhost:8080/EUMProdTool/manage";
+							if (responseText) {
+								window.location.href = "http://localhost:8080/EUMProdTool/manage";
+							} else {
+								window.location.href = "http://localhost:8080/EUMProdTool/error";
+							}
 				        }
 					});
 				}
@@ -460,7 +467,11 @@
 						report_end_date		: $("#report_end_date").val()
 					},
 					success : function(responseText) {
-						window.location.href = "http://localhost:8080/EUMProdTool/manage";
+						if (responseText) {
+							window.location.href = "http://localhost:8080/EUMProdTool/manage";
+						} else {
+							window.location.href = "http://localhost:8080/EUMProdTool/error";
+						}
 			        }
 				});
 			}

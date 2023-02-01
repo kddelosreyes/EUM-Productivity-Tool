@@ -26,22 +26,27 @@
 					<table id="activity_types_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
+								<th>Id</th>
 							</tr>
 						</thead>
 						<tbody>
+							<c:set var="count" scope="page" value="${1}"/>
 							<c:forEach items="${activity_types}" var="activityType">
 								<tr>
-									<td>${activityType.id}</td>
+									<td>${count}</td>
 									<td>${activityType.type}</td>
+									<td>${activityType.uuid}</td>
 								</tr>
+								<c:set var="count" scope="page" value="${count + 1}"/>
 							</c:forEach>
 						</tbody>
 						<tfoot>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
+								<th>Id</th>
 							</tr>
 						</tfoot>
 					</table>
@@ -69,25 +74,27 @@
 					<table id="activities_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Date Created</th>
 							</tr>
 						</thead>
 						<tbody>
+							<c:set var="count" scope="page" value="${1}"/>
 							<c:forEach items="${activities}" var="activity">
 								<tr>
-									<td>${activity.id}</td>
+									<td>${count}</td>
 									<td>${activity.name}</td>
 									<td>${activity.activityType.type}</td>
 									<td>${activity.createdDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd hh:mm a"))}</td>
 								</tr>
+								<c:set var="count" scope="page" value="${count + 1}"/>
 							</c:forEach>
 						</tbody>
 						<tfoot>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Date Created</th>
@@ -118,7 +125,7 @@
 					<table id="fields_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Required</th>
@@ -126,19 +133,21 @@
 							</tr>
 						</thead>
 						<tbody>
+							<c:set var="count" scope="page" value="${1}"/>
 							<c:forEach items="${activity_fields}" var="field">
 								<tr>
-									<td>${field.id}</td>
+									<td>${count}</td>
 									<td>${field.name}</td>
 									<td>${field.type}</td>
 									<td>${field.isRequired ? "Yes" : "No"}</td>
 									<td>${field.createdDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd hh:mm a"))}</td>
 								</tr>
+								<c:set var="count" scope="page" value="${count + 1}"/>
 							</c:forEach>
 						</tbody>
 						<tfoot>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Name</th>
 								<th>Type</th>
 								<th>Required</th>
@@ -170,25 +179,27 @@
 					<table id="activity_field_map_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Activity</th>
 								<th>Field Name</th>
 								<th>Date Created</th>
 							</tr>
 						</thead>
 						<tbody>
+							<c:set var="count" scope="page" value="${1}"/>
 							<c:forEach items="${activity_field_map}" var="activity_field">
 								<tr>
-									<td>${activity_field.id}</td>
+									<td>${count}</td>
 									<td>${activity_field.activityName}</td>
 									<td>${activity_field.fieldName}</td>
 									<td>${activity_field.createdDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd hh:mm a"))}</td>
 								</tr>
+								<c:set var="count" value="${count + 1}" scope="page"/>
 							</c:forEach>
 						</tbody>
 						<tfoot>
 							<tr>
-								<th>Id</th>
+								<th>#</th>
 								<th>Activity</th>
 								<th>Field Name</th>
 								<th>Date Created</th>
@@ -213,7 +224,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="activity_type_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="activity_type_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_ACTIVITY_TYPE" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control"
@@ -221,7 +232,7 @@
 									<label for="activity_type_name">Name</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_activity_type" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_activity_type" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>
@@ -244,7 +255,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="activity_type_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="activity_type_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_ACTIVITY" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control"
@@ -260,7 +271,7 @@
 									<label for="activity_type">Type</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_activity" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_activity" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>
@@ -283,7 +294,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="field_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="field_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_FIELD" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control"
@@ -301,7 +312,7 @@
 								<small class="text-muted">Required</small>
 								<br>
 								<div class="input-group">
-									<input type="radio" class="btn-check btn-outline-secondary" name="is_required" id="is_required_yes" values="1" autocomplete="off" checked>
+									<input type="radio" class="btn-check btn-outline-secondary" name="is_required" id="is_required_yes" value="1" autocomplete="off" checked>
 									<label class="btn btn-outline-secondary" for="is_required_yes">Yes</label>
 									
 									<input type="radio" class="btn-check" name="is_required" id="is_required_no" value="0" autocomplete="off">
@@ -309,7 +320,7 @@
 								</div>
 								<br>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_field" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_field" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>
@@ -332,7 +343,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="field_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="field_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_ACTIVITY_FIELD_MAP" />
 								<div class="form-floating mb-3">
 									<select	class="form-select" name="map_activity_value" style="display: inline">
@@ -351,7 +362,7 @@
 									<label for="map_field_value">Field</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_field" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_field" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>

@@ -59,4 +59,14 @@ public class FormFieldService extends Service {
 		return entities;
 	}
 	
+	public Integer insertNewField(String name, String type, Integer isRequired) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + " (name, type, is_required) "
+				+ "VALUES(?1, ?2, ?3)";
+		Query query = new Query(sql);
+		query.params(name, type, isRequired);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
 }

@@ -98,10 +98,22 @@
 					} else if (responseText === 'ANALYST-LOGIN') {
 						window.location.href = "http://localhost:8080/EUMProdTool/home";
 					} else if (responseText === 'CHANGE-PASSWORD') {
+						setFieldsDefault();
 						window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
 					} else {
-						$("#feedback").css("visibility", "visible");
-						$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> " + responseText);
+						<%
+							String errorMessage = (String) session.getAttribute("error_message");
+						%>
+						
+						var jsLastPage = '<%= errorMessage %>';
+						console.log(jsLastPage);
+						if (responseText) {
+							$("#feedback").css("visibility", "visible");
+							$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> " + responseText);
+						} else {
+							setFieldsDefault();
+							window.location.href = "http://localhost:8080/EUMProdTool/error";
+						}
 					}
 		        }
 			});
@@ -110,6 +122,11 @@
 		$("#forgot_password").click(function() {
 			window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
 		});
+		
+		function setFieldsDefault() {
+			$('#username').val('');
+			$('#password').val('');
+		}
 	});
 	</script>
 </body>

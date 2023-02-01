@@ -14,8 +14,12 @@ import javax.servlet.http.HttpSession;
 
 import com.project.eum.prodtool.model.Report;
 import com.project.eum.prodtool.model.column.ReportColumn;
+import com.project.eum.prodtool.service.ActivityFieldService;
+import com.project.eum.prodtool.service.ActivityService;
+import com.project.eum.prodtool.service.ActivityTypeService;
 import com.project.eum.prodtool.service.AnalystLoginService;
 import com.project.eum.prodtool.service.AnalystService;
+import com.project.eum.prodtool.service.FormFieldService;
 import com.project.eum.prodtool.service.ReportService;
 import com.project.eum.prodtool.utils.DateTimeUtils;
 import com.project.eum.prodtool.utils.PasswordUtils;
@@ -31,12 +35,16 @@ import com.project.eum.prodtool.view.TabDetails_Team;
  * Servlet implementation class Manage
  */
 @WebServlet("/ManageServlet")
-public class ManageServlet extends HttpServlet {
+public class ManageServlet extends AppServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private final ReportService reportService = new ReportService();
 	private final AnalystService analystService = new AnalystService();
 	private final AnalystLoginService analystLoginService = new AnalystLoginService();
+	private final ActivityTypeService activityTypeService = new ActivityTypeService();
+	private final ActivityService activityService = new ActivityService();
+	private final FormFieldService formFieldService = new FormFieldService();
+	private final ActivityFieldService activityFieldService = new ActivityFieldService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -81,6 +89,18 @@ public class ManageServlet extends HttpServlet {
 				break;
 			case "CREATE_ANALYST":
 				createAnalyst(request, response);
+				break;
+			case "CREATE_ACTIVITY_TYPE":
+				createActivityType(request, response);
+				break;
+			case "CREATE_ACTIVITY":
+				createActivity(request, response);
+				break;
+			case "CREATE_FIELD":
+				createField(request, response);
+				break;
+			case "CREATE_ACTIVITY_FIELD_MAP":
+				createActivityFieldMap(request, response);
 				break;
 			default:
 				defaultAction(request, response);
@@ -183,8 +203,8 @@ public class ManageServlet extends HttpServlet {
 			session.setAttribute("message", "Report generated successfully.");
 			
 			response.getWriter().write(Integer.toString(returnedKey));
-		} catch(SQLException exc) {
-			exc.printStackTrace();
+		} catch(SQLException exception) {
+			handleException(request, response, exception, false);
 		}
 	}
 	
@@ -236,10 +256,95 @@ public class ManageServlet extends HttpServlet {
 					System.out.println("Created analyst and account.");
 					
 					response.getWriter().write(Integer.toString(returnedKey));
+				} else {
+					throw new RuntimeException("There is an error on adding analyst.");
 				}
 			}
-		} catch (SQLException exc) {
-			exc.printStackTrace();
+		} catch (Exception exception) {
+			handleException(request, response, exception, false);
+		}
+	}
+	
+	private void createActivityType(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String activityTypeName = request.getParameter("activity_type_name");
+			int key = activityTypeService.insertNewActivityType(activityTypeName);
+			
+			if (key > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ACTIVITY");
+				session.setAttribute("message", "Activity type successfully created.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating activity type.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String name = request.getParameter("activity_name");
+			Integer typeId = Integer.parseInt(request.getParameter("activity_type"));
+			
+			int key = activityService.insertNewActivity(name, typeId);
+			
+			if (key > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ACTIVITY");
+				session.setAttribute("message", "Activity successfully created.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating activity.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createField(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String name = request.getParameter("field_name");
+			String type = request.getParameter("field_type");
+			Integer isRequired = Integer.parseInt(request.getParameter("is_required"));
+			
+			int key = formFieldService.insertNewField(name, type, isRequired);
+			
+			if (key > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ACTIVITY");
+				session.setAttribute("message", "Field successfully created.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating field.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createActivityFieldMap(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			Integer activityId = Integer.parseInt(request.getParameter("map_activity_value"));
+			Integer fieldId = Integer.parseInt(request.getParameter("map_field_value"));
+			
+			int key = activityFieldService.insertNewActivityField(activityId, fieldId);
+			
+			if (key > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ACTIVITY");
+				session.setAttribute("message", "Activity-field mapping successfully created.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
 		}
 	}
 

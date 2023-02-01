@@ -134,4 +134,14 @@ public class ActivityService extends Service {
 		return mapping;
 	}
 	
+	public Integer insertNewActivity(String name, Integer typeId) throws SQLException {		
+		String sql = "INSERT INTO " + getTableName() + " (name, activity_type_id, uuid) "
+				+ "VALUES(?1, ?2, uuid())";
+		Query query = new Query(sql);
+		query.params(name, typeId);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
 }
