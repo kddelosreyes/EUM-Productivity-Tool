@@ -58,4 +58,17 @@ public class AnalystLoginService extends Service {
 		return key;
 	}
 	
+	public Integer updateAnalystLoginPassword(Integer analystLoginId, String password) throws SQLException {
+		String sqlQuery = "UPDATE " + getTableName() + " "
+				+ "SET password = ?1, "
+				+ "is_locked = ?2 "
+				+ "WHERE id = ?3";
+		
+		Query query = new Query(sqlQuery);
+		query.params(password, 0, analystLoginId);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
 }

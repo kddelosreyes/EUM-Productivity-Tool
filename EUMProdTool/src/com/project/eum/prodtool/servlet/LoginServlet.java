@@ -136,25 +136,34 @@ public class LoginServlet extends HttpServlet {
 								(String) analystLogin.get(AnalystLoginField.PASSWORD),
 								(String) analystLogin.get(AnalystLoginField.SALT));
 						if (isVerified) {
-							Integer analystId = (Integer) analystLogin.get(AnalystLoginField.ANALYST_ID);
-							Entity shiftSchedule = shiftScheduleService.getShiftScheduleByAnalystId(analystId);
-							
-							if (shiftSchedule == null) {
-								response.getWriter().write("No active shift schedule.");
+							if (analystLogin.getIsLocked()) {
+								HttpSession session = request.getSession(false);
+								Integer analystId = (Integer) analystLogin.get(AnalystLoginField.ANALYST_ID);
+								Analyst analyst = (Analyst) analystService.getEntityById(analystId);
+								setSessionDetails(session, analyst, analystLogin);
+								
+								response.getWriter().write("CHANGE-PASSWORD");
 							} else {
-								if (analystService.hasTeam(analystId)) {
-									HttpSession session = request.getSession(false);
-									Analyst analyst = (Analyst) analystService.getEntityById(analystId);
-									
-									analystLoginHistoryService.insertNewAnalystLoginHistory((Integer) analystLogin.get(AnalystLoginField.ID));
-									if (!attendanceService.hasAttendanceForToday(analystId)) {
-										attendanceService.insertNewAttendanceForAnalystId(analystId);
-									}
-									
-									setSessionDetails(session, analyst, analystLogin);
-									response.getWriter().write("ANALYST-LOGIN");
+								Integer analystId = (Integer) analystLogin.get(AnalystLoginField.ANALYST_ID);
+								Entity shiftSchedule = shiftScheduleService.getShiftScheduleByAnalystId(analystId);
+								
+								if (shiftSchedule == null) {
+									response.getWriter().write("No active shift schedule.");
 								} else {
-									response.getWriter().write("Analyst does not belong to a team.");
+									if (analystService.hasTeam(analystId)) {
+										HttpSession session = request.getSession(false);
+										Analyst analyst = (Analyst) analystService.getEntityById(analystId);
+										
+										analystLoginHistoryService.insertNewAnalystLoginHistory((Integer) analystLogin.get(AnalystLoginField.ID));
+										if (!attendanceService.hasAttendanceForToday(analystId)) {
+											attendanceService.insertNewAttendanceForAnalystId(analystId);
+										}
+										
+										setSessionDetails(session, analyst, analystLogin);
+										response.getWriter().write("ANALYST-LOGIN");
+									} else {
+										response.getWriter().write("Analyst does not belong to a team.");
+									}
 								}
 							}
 						} else {

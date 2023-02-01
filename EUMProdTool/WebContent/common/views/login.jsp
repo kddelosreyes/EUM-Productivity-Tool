@@ -26,14 +26,14 @@
 					<form id="login_form" action="<%=request.getContextPath()%>/login" method="post">
 						<input type="hidden" name="command" value="LOGIN" />
 						<div class="form-floating mb-3">
-							<input type="email" class="form-control" name="username"
-								id="username" placeholder="name@indracompany.com" required> <label
-								for="floatingInput">Email address</label>
+							<input type="text" class="form-control" name="username"
+								id="username" placeholder="Username" required> <label
+								for="username">Username</label>
 						</div>
 						<div class="form-floating">
 							<input type="password" class="form-control" name="password"
 								id="password" placeholder="Password" required> <label
-								for="floatingPassword">Password</label>
+								for="password">Password</label>
 						</div>
 						<br>
 						<div class="form-floating">
@@ -96,12 +96,18 @@
 						window.location.href = "http://localhost:8080/EUMProdTool/manage";
 					} else if (responseText === 'ANALYST-LOGIN') {
 						window.location.href = "http://localhost:8080/EUMProdTool/home";
+					} else if (responseText === 'CHANGE-PASSWORD') {
+						window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
 					} else {
 						$("#feedback").css("visibility", "visible");
 						$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> " + responseText);
 					}
 		        }
 			});
+		});
+		
+		$("#forgot_password").click(function() {
+			window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
 		});
 	});
 	</script>
