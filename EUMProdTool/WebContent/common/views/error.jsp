@@ -1,15 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
-<%@ page errorPage="error.jsp" %>  
+<%@ page isErrorPage="true" language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>  
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<%
-	response.setHeader("Pragma","no-cache");
-	response.setHeader("Cache-Control","no-store");
-	response.setHeader("Expires","0");
-	response.setDateHeader("Expires",-1);
-%>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>EUM Productivity Tool</title>
 
@@ -22,34 +15,15 @@
 	<main>
 		<div class="container">
 			<div class="row">
-				<div class="col"></div>
-				<div class="col">
-					<form id="login_form" action="<%=request.getContextPath()%>/login" method="post">
-						<input type="hidden" name="command" value="LOGIN" />
-						<div class="form-floating mb-3">
-							<input type="text" class="form-control" name="username"
-								id="username" placeholder="Username" required> <label
-								for="username">Username</label>
-						</div>
-						<div class="form-floating">
-							<input type="password" class="form-control" name="password"
-								id="password" placeholder="Password" required> <label
-								for="password">Password</label>
-						</div>
-						<br>
-						<div class="form-floating">
-							<button type="button" class="btn btn-primary mb-3" id="login" value="Login">
-								<i class="bi bi-box-arrow-in-right"></i> Login
-							</button>
-							<button type="button" class="btn btn-danger mb-3" id="forgot_password" value="Forgot Password">
-								<i class="bi bi-unlock"></i> Forgot Password
-							</button>
-						</div>
-						<div id="feedback" class="alert alert-danger" role="alert" style="visibility:hidden">
-						</div>
-					</form>
+				<div class="col-2"></div>
+				<div class="col-8">
+					<h3>An error occured. Please contact support or administrator.</h3>  
+  
+					<p>
+						<%= exception %>
+					</p> 
 				</div>
-				<div class="col"></div>
+				<div class="col-2"></div>
 			</div>
 		</div>
 	</main>

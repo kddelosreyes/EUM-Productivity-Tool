@@ -1,12 +1,13 @@
 @font-face {
 	font-family: "FontAwesome";
-	src: url(fonts/BlackFriday.otf);
+	src: url(fonts/Roboto.ttf);
 }
 
 html, body {
   height: 100%;
   margin: 0;
   font-family: "FontAwesome";
+  font-size: 0.9rem !important;
 }
 
 td {
