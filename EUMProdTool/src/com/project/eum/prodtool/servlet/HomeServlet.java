@@ -178,46 +178,7 @@ public class HomeServlet extends HttpServlet {
 		}
 	}
 	
-	protected void startActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		/*Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
-		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
-		
-		try {
-			HttpSession session = request.getSession(false);
-			if (session.getAttribute("record_inserted_successfully") == null) {				
-				Activity activity = (Activity) activityService.getEntityById(activityId);
-				
-				int returnedKey = analystActivityService.insertNewAnalystActivity(analystId, activityId);
-				
-				if (returnedKey == -1) {
-					throw new SQLException("Affected rows = 0");
-				} else {					
-					int activityTypeId = (Integer) activity.get(ActivityField.ACTIVITY_TYPE_ID);
-					if (activityTypeId == 1) {
-						session.setAttribute("record_inserted_successfully", "true");
-						session.setAttribute("inserted_id", returnedKey);
-						
-						System.out.println("Affected Rows: " + returnedKey);
-						request.setAttribute("analyst_activity_id", returnedKey);
-						request.setAttribute("is_new", true);
-						
-						RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
-						dispatcher.forward(request, response);
-					} else {
-						response.sendRedirect(request.getContextPath() + "/home");
-					}
-				}
-			} else {
-				Integer analystActivityId = (Integer) session.getAttribute("inserted_id");
-				request.setAttribute("analyst_activity_id", analystActivityId);
-				
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
-				dispatcher.forward(request, response);
-			}
-		} catch (SQLException exc) {
-			exc.printStackTrace();
-		}*/
-		
+	protected void startActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
 		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
 		

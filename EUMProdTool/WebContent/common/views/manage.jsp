@@ -487,8 +487,6 @@
 				
 				if (isAnyMessageEmpty(messages)) {
 					createToastMessage(messages);
-				} else {
-					
 				}
 			}
 			

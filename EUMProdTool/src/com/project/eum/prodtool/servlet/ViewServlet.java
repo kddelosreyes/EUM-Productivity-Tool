@@ -166,8 +166,6 @@ public class ViewServlet extends HttpServlet {
 				fields = formFieldService.getFormFieldsByActivityId((Integer) analystActivity.get(AnalystActivityField.activityId));
 			}
 			
-			
-			
 			Map<Integer, String> fieldValues = new HashMap<Integer, String>();
 			for (FormField field : fields) {
 				Integer fieldId = (Integer) field.get(FormFieldField.id);

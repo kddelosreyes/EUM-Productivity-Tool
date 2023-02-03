@@ -84,17 +84,7 @@
 											  	<label for="${analyst_activity.id}_${field.id}_${field.type}">${field.name}</label>
 											</div>
 										</c:when>
-										<c:when test="${field.type == 'checkbox'}">
-											
-											<!-- <div class="input-group">
-												<input type="radio" class="btn-check btn-outline-secondary" name="is_required" id="is_required_yes" value="1" autocomplete="off" checked>
-												<label class="btn btn-outline-secondary" for="is_required_yes">Yes</label>
-												
-												<input type="radio" class="btn-check" name="is_required" id="is_required_no" value="0" autocomplete="off">
-												<label class="btn btn-outline-secondary" for="is_required_no">No</label>
-											</div>
-											<br>-->
-											
+										<c:when test="${field.type == 'checkbox'}">											
 											<div class="form-check form-switch">
 												<c:if test="${field.value == 'checked'}">
 													<input type="checkbox" class="form-check-input" 
@@ -106,7 +96,7 @@
 													<input type="checkbox" class="form-check-input" 
 													  	id="${field.type}"
 													  	name="${analyst_activity.id}_${field.id}_${field.type}"
-													  	value="${field.value}" placeholder="${field.name}" required>
+													  	value="checked" placeholder="${field.name}" required>
 												</c:if>
 											  	<label class="form-check-label" for="${analyst_activity.id}_${field.id}_${field.type}">${field.name}</label>
 											</div>

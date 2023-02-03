@@ -46,9 +46,6 @@
 								id="captcha" placeholder="Code" disabled>
 							<label for="captcha">Code</label>
 						</div>
-						<!-- <div class="restart">
-							<a href="" onclick="createCaptcha()">Change</a>
-						</div>-->
 						<div class="form-floating mb-3">
 							<input type="text" class="form-control" name="confirm_captcha"
 								id="confirm_captcha" placeholder="Confirm Code" required>
@@ -113,17 +110,14 @@
 					validateCaptcha++;
 				}
 			}
+			
 			if (recaptcha == "") {
 				$("#feedback").css("visibility", "visible");
-				$("#feedback")
-						.html(
-								"<i class='bi bi-exclamation-triangle'></i> Code must be filled.");
+				$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> Code must be filled.");
 				return false;
 			} else if (validateCaptcha > 0 || recaptcha.length > 9) {
 				$("#feedback").css("visibility", "visible");
-				$("#feedback")
-						.html(
-								"<i class='bi bi-exclamation-triangle'></i> Wrong captcha.");
+				$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> Wrong captcha.");
 				return false;
 			} else {
 				return true;
@@ -140,15 +134,64 @@
 				}
 			});
 
-			$('#password').keypress(function(e) {
+			$('#password').keyup(function(e) {
 				if (e.keyCode == 13) {
 					$('#confirm').click();
+				} else {
+					let strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})');
+					var password = $('#password');
+					var confirmPassword = $('#confirm_password');
+					password.removeClass("is-invalid");
+					password.removeClass("is-valid");
+					confirmPassword.removeClass("is-invalid");
+					confirmPassword.removeClass("is-valid");
+					
+					console.log(password.val());
+					
+					if(strongPassword.test(password.val())) {
+						password.addClass("is-valid");
+					} else {
+						if (password.val().length > 0) {
+							password.addClass("is-invalid");
+						} else {
+							password.removeClass("is-invalid");
+						}
+					}
+					
+					if (confirmPassword.val().length > 0) {
+						console.log(confirmPassword.val() + " " + password.val());
+						if (password.val() === confirmPassword.val()) {
+							console.log(true);
+							confirmPassword.addClass("is-invalid");
+						} else {
+							console.log(false);
+							confirmPassword.addClass("is-valid");
+						}
+					}
 				}
 			});
 			
-			$('#confirm_password').keypress(function(e) {
+			$('#confirm_password').keyup(function(e) {
 				if (e.keyCode == 13) {
 					$('#confirm').click();
+				} else {
+					var password = $('#password');
+					var confirmPassword = $('#confirm_password');
+					
+					confirmPassword.removeClass("is-invalid");
+					confirmPassword.removeClass("is-valid");
+					
+					console.log(confirmPassword.val());
+					
+					if (password.val() === confirmPassword.val()) {
+						confirmPassword.addClass("is-valid");
+					} else {
+						if (confirmPassword.val().length > 0) {
+							confirmPassword.addClass("is-invalid");
+						} else {
+							confirmPassword.removeClass("is-invalid");
+						}
+					}
 				}
 			});
 			

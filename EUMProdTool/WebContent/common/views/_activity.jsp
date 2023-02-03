@@ -306,6 +306,7 @@
 										<option value="text">Text</option>
 										<option value="date">Date</option>
 										<option value="time">Time</option>
+										<option value="time">Checkbox</option>
 									</select>
 									<label for="field_type">Type</label>
 								</div>
