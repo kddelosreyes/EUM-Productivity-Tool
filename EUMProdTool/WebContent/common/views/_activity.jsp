@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activity_types_table" class="table table-striped nowrap" style="width:100%">
+					<table id="activity_types_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -71,7 +71,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activities_table" class="table table-striped nowrap" style="width:100%">
+					<table id="activities_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -122,7 +122,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="fields_table" class="table table-striped nowrap" style="width:100%">
+					<table id="fields_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -176,7 +176,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="activity_field_map_table" class="table table-striped nowrap" style="width:100%">
+					<table id="activity_field_map_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -298,7 +298,7 @@
 								<input type="hidden" name="command" value="CREATE_FIELD" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control"
-										name="field_name" placeholder="Name">
+										name="field_name" placeholder="Name" required>
 									<label for="field_name">Name</label>
 								</div>
 								<div class="form-floating mb-3">

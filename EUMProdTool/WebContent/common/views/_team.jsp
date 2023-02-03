@@ -173,7 +173,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="create_team_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="create_team_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_TEAM" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control" id="create_team_team_name"
@@ -189,7 +189,7 @@
 									<label for="create_team_type">Type</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_team" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_team" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>
@@ -256,7 +256,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="field_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="field_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_TEAM_ACTIVITY" />
 								<div class="form-floating mb-3">
 									<select	class="form-select" id="team_activity_team" 
@@ -277,7 +277,7 @@
 									<label for="team_activity_activity">Activity</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_team_activity" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_team_activity" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>

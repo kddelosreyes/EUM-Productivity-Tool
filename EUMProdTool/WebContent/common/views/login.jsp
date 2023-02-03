@@ -24,7 +24,7 @@
 			<div class="row">
 				<div class="col"></div>
 				<div class="col">
-					<form id="login_form" action="<%=request.getContextPath()%>/login" method="post">
+					<form id="login_form" action="<%=request.getContextPath()%>/login" method="post" autocomplete="off">
 						<input type="hidden" name="command" value="LOGIN" />
 						<div class="form-floating mb-3">
 							<input type="text" class="form-control" name="username"

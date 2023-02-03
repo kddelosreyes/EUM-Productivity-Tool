@@ -18,7 +18,6 @@ import com.project.eum.prodtool.model.AnalystActivity;
 import com.project.eum.prodtool.model.Attendance;
 import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.add.TimeSummary;
-import com.project.eum.prodtool.model.field.ActivityField;
 import com.project.eum.prodtool.model.field.AnalystField;
 import com.project.eum.prodtool.service.ActivityService;
 import com.project.eum.prodtool.service.AnalystActivityService;

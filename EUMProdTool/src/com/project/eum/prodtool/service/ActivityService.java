@@ -51,16 +51,18 @@ public class ActivityService extends Service {
 	public List<Activity> getActivitiesByAnalystId(Integer analystId) throws SQLException {
 		List<Activity> entities = new ArrayList<Activity>();
 		
-		Query query = new Query("SELECT a.* FROM " + getTableName() + " a "
-				+ "join team_activity ta "
-		    		+ "on ta.activity_id = a.id "
-		    	+ "join team t "
-		    		+ "on t.id = ta.team_id "
-			    + "join analyst_team ant "
-			    	+ "on ant.team_id = t.id "
-			    + "join analyst an "
-			    	+ "on an.id = ant.analyst_id "
-				+ "where an.id = ?1");
+		Query query = new Query("SELECT a.* "
+				+ "FROM " + getTableName() + " a "
+				+ "JOIN  team_activity ta "
+				+ "		ON ta.activity_id = a.id "
+		    	+ "JOIN team t "
+		    	+ "		ON t.id = ta.team_id "
+			    + "JOIN analyst_team ant "
+			    + "		ON ant.team_id = t.id "
+			    + "JOIN analyst an "
+			    + "		ON an.id = ant.analyst_id "
+				+ "WHERE an.id = ?1 "
+				+ "		AND ANT.isactive = 1");
 		query.params(analystId);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());

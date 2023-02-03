@@ -44,7 +44,7 @@ public class TeamService extends Service {
 	public List<T_AnalystTeam> getAnalystTeam() throws SQLException {
 		List<T_AnalystTeam> analystTeams = new ArrayList<>();
 		
-		String sql = "SELECT CONCAT(first_name, ' ', last_name) as 'analyst_name', role, GROUP_CONCAT(t.name SEPARATOR ', ') as 'team_name', ant.created_date FROM analyst a JOIN analyst_team ant ON a.id = ant.analyst_id JOIN team t ON t.id = ant.team_id WHERE a.is_active = 1 GROUP BY a.id ORDER BY a.id, t.id";
+		String sql = "SELECT CONCAT(first_name, ' ', last_name) as 'analyst_name', role, GROUP_CONCAT(t.name SEPARATOR ', ') as 'team_name', ant.created_date FROM analyst a JOIN analyst_team ant ON a.id = ant.analyst_id JOIN team t ON t.id = ant.team_id WHERE ant.isactive = 1 AND a.is_active = 1 GROUP BY a.id ORDER BY a.id, t.id";
 		Query query = new Query(sql);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());
@@ -77,6 +77,16 @@ public class TeamService extends Service {
 		}
 		
 		return activityTeams;
+	}
+	
+	public Integer insertNewTeam(String teamName, String type) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + " (name, type) "
+				+ "VALUES(?1, ?2)";
+		Query query = new Query(sql);
+		query.params(teamName, type);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
 	}
 	
 }

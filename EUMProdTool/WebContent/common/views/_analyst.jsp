@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="analysts_table" class="table table-striped nowrap" style="width:100%">
+					<table id="analysts_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>First Name</th>
@@ -31,7 +31,7 @@
 								<th>Last Name</th>
 								<th>Role</th>
 								<th>Email</th>
-								<th>Is Active</th>
+								<th>Status</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
@@ -78,7 +78,7 @@
 								<th>Last Name</th>
 								<th>Role</th>
 								<th>Email</th>
-								<th>Is Active</th>
+								<th>Status</th>
 								<th>Actions</th>
 							</tr>
 						</tfoot>
@@ -105,7 +105,7 @@
 								<input type="hidden" name="command" value="CREATE_ANALYST" />
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control" id="analyst_first_name"
-										name="analyst_first_name" placeholder="First Name"/>
+										name="analyst_first_name" placeholder="First Name" required/>
 									<label for="analyst_first_name">First Name</label>
 								</div>
 								<div class="form-floating mb-3">
@@ -115,17 +115,17 @@
 								</div>
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control" id="analyst_last_name"
-										name="analyst_last_name" placeholder="Last Name"/>
+										name="analyst_last_name" placeholder="Last Name" required/>
 									<label for="analyst_last_name">Last Name</label>
 								</div>
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control" id="analyst_role"
-										name="analyst_role" placeholder="Role"/>
+										name="analyst_role" placeholder="Role" required/>
 									<label for="analyst_role">Role</label>
 								</div>
 								<div class="form-floating mb-3">
 									<input type="email" class="form-control" id="analyst_email"
-										name="analyst_email" placeholder="Email Address"/>
+										name="analyst_email" placeholder="Email Address" required/>
 									<label for="analyst_email">Email Address</label>
 								</div>
 								<div class="form-floating mb-3">

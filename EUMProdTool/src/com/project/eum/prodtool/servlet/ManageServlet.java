@@ -19,8 +19,11 @@ import com.project.eum.prodtool.service.ActivityService;
 import com.project.eum.prodtool.service.ActivityTypeService;
 import com.project.eum.prodtool.service.AnalystLoginService;
 import com.project.eum.prodtool.service.AnalystService;
+import com.project.eum.prodtool.service.AnalystTeamService;
 import com.project.eum.prodtool.service.FormFieldService;
 import com.project.eum.prodtool.service.ReportService;
+import com.project.eum.prodtool.service.TeamActivityService;
+import com.project.eum.prodtool.service.TeamService;
 import com.project.eum.prodtool.utils.DateTimeUtils;
 import com.project.eum.prodtool.utils.PasswordUtils;
 import com.project.eum.prodtool.utils.ReportGeneratorUtils;
@@ -45,6 +48,9 @@ public class ManageServlet extends AppServlet {
 	private final ActivityService activityService = new ActivityService();
 	private final FormFieldService formFieldService = new FormFieldService();
 	private final ActivityFieldService activityFieldService = new ActivityFieldService();
+	private final TeamService teamService = new TeamService();
+	private final AnalystTeamService analystTeamService = new AnalystTeamService();
+	private final TeamActivityService teamActivityService = new TeamActivityService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -107,6 +113,15 @@ public class ManageServlet extends AppServlet {
 				break;
 			case "DEACTIVATE_ANALYST":
 				deactivateAnalyst(request, response);
+				break;
+			case "CREATE_TEAM":
+				createTeam(request, response);
+				break;
+			case "CREATE_ANALYST_TEAM":
+				createAnalystTeam(request, response);
+				break;
+			case "CREATE_TEAM_ACTIVITY":
+				createTeamActivity(request, response);
 				break;
 			default:
 				defaultAction(request, response);
@@ -207,7 +222,7 @@ public class ManageServlet extends AppServlet {
 			
 			HttpSession session = request.getSession(false);
 			session.setAttribute("last_page", "REPORT");
-			session.setAttribute("message", "Report generated successfully.");
+			session.setAttribute("message", "Successfully generated a new report.");
 			
 			response.getWriter().write(Integer.toString(returnedKey));
 		} catch(SQLException exception) {
@@ -233,7 +248,7 @@ public class ManageServlet extends AppServlet {
 			
 			HttpSession session = request.getSession(false);
 			session.setAttribute("last_page", "REPORT");
-			session.setAttribute("message", "Report successfully archived.");
+			session.setAttribute("message", "Successfully archived the report.");
 			
 			response.sendRedirect(request.getContextPath() + "/manage");
 		} catch(SQLException exc) {
@@ -258,7 +273,7 @@ public class ManageServlet extends AppServlet {
 				if (returnedKey > 0) {
 					HttpSession session = request.getSession(false);
 					session.setAttribute("last_page", "ANALYST");
-					session.setAttribute("message", "Analyst successfully created.");
+					session.setAttribute("message", "Successfully created a new analyst.");
 					
 					System.out.println("Created analyst and account.");
 					
@@ -273,62 +288,78 @@ public class ManageServlet extends AppServlet {
 	}
 	
 	private void createActivityType(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String activityTypeName = request.getParameter("activity_type_name");
 		try {
-			String activityTypeName = request.getParameter("activity_type_name");
 			int key = activityTypeService.insertNewActivityType(activityTypeName);
 			
 			if (key > 0) {
 				HttpSession session = request.getSession(false);
 				session.setAttribute("last_page", "ACTIVITY");
-				session.setAttribute("message", "Activity type successfully created.");
+				session.setAttribute("message", "Successfully created a new activity type.");
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
 				throw new RuntimeException("There is an error on creating activity type.");
 			}
-		} catch (Exception exception) {
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "ACTIVITY");
+			session.setAttribute("error_message", "There is already an activity type with existing name '" + activityTypeName + "'.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
+		}  catch (Exception exception) {
 			handleException(request, response, exception, true);
 		}
 	}
 	
 	private void createActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String name = request.getParameter("activity_name");
-			Integer typeId = Integer.parseInt(request.getParameter("activity_type"));
-			
+		String name = request.getParameter("activity_name");
+		Integer typeId = Integer.parseInt(request.getParameter("activity_type"));
+		try {			
 			int key = activityService.insertNewActivity(name, typeId);
 			
 			if (key > 0) {
 				HttpSession session = request.getSession(false);
 				session.setAttribute("last_page", "ACTIVITY");
-				session.setAttribute("message", "Activity successfully created.");
+				session.setAttribute("message", "Successfully created a new activity.");
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
 				throw new RuntimeException("There is an error on creating activity.");
 			}
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "ACTIVITY");
+			session.setAttribute("error_message", "There is already an activity with existing name '" + name + "'.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
 		} catch (Exception exception) {
 			handleException(request, response, exception, true);
 		}
 	}
 	
 	private void createField(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
-			String name = request.getParameter("field_name");
-			String type = request.getParameter("field_type");
-			Integer isRequired = Integer.parseInt(request.getParameter("is_required"));
-			
+		String name = request.getParameter("field_name");
+		String type = request.getParameter("field_type");
+		Integer isRequired = Integer.parseInt(request.getParameter("is_required"));
+		try {			
 			int key = formFieldService.insertNewField(name, type, isRequired);
 			
 			if (key > 0) {
 				HttpSession session = request.getSession(false);
 				session.setAttribute("last_page", "ACTIVITY");
-				session.setAttribute("message", "Field successfully created.");
+				session.setAttribute("message", "Successfully created a new field.");
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
 				throw new RuntimeException("There is an error on creating field.");
 			}
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "ACTIVITY");
+			session.setAttribute("error_message", "There is already a field with existing name '" + name + "'.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
 		} catch (Exception exception) {
 			handleException(request, response, exception, true);
 		}
@@ -344,13 +375,19 @@ public class ManageServlet extends AppServlet {
 			if (key > 0) {
 				HttpSession session = request.getSession(false);
 				session.setAttribute("last_page", "ACTIVITY");
-				session.setAttribute("message", "Activity-field mapping successfully created.");
+				session.setAttribute("message", "Successfully created a new activity-field mapping.");
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
 				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
 			}
-		} catch (Exception exception) {
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "ACTIVITY");
+			session.setAttribute("error_message", "There is already an existing activity-field mapping.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
+		}  catch (Exception exception) {
 			handleException(request, response, exception, true);
 		}
 	}
@@ -368,7 +405,7 @@ public class ManageServlet extends AppServlet {
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
-				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
+				throw new RuntimeException("There is an error on activating the analyst.");
 			}
 		} catch (Exception exception) {
 			handleException(request, response, exception, true);
@@ -388,8 +425,86 @@ public class ManageServlet extends AppServlet {
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {
-				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
+				throw new RuntimeException("There is an error on deactivating the analyst.");
 			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createTeam(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String teamName = request.getParameter("create_team_team_name");
+		String teamType = request.getParameter("create_team_type");
+		try {			
+			int affectedRows = teamService.insertNewTeam(teamName, teamType);
+			
+			if (affectedRows > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "TEAM");
+				session.setAttribute("message", "Successfully created a new team.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a team.");
+			}
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "TEAM");
+			session.setAttribute("error_message", "There is already a team with an existing name '" + teamName + "'.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createAnalystTeam(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer analystId = Integer.parseInt(request.getParameter("analyst_team_analyst"));
+		Integer teamId = Integer.parseInt(request.getParameter("analyst_team_team"));
+		try {			
+			int affectedRows = analystTeamService.insertNewAnalystTeam(analystId, teamId);
+			
+			if (affectedRows > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "TEAM");
+				session.setAttribute("message", "Successfully created a new analyst-team mapping.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a new analyst-team mapping.");
+			}
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "TEAM");
+			session.setAttribute("error_message", "There is already an existing analyst-team mapping.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void createTeamActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer teamId = Integer.parseInt(request.getParameter("team_activity_team"));
+		Integer activityId = Integer.parseInt(request.getParameter("team_activity_activity"));
+		try {			
+			int affectedRows = teamActivityService.insertNewTeamActivity(teamId, activityId);
+			
+			if (affectedRows > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "TEAM");
+				session.setAttribute("message", "Successfully creating a new team-activity mapping.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a new team-activity mapping.");
+			}
+		} catch (SQLException exception) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "TEAM");
+			session.setAttribute("error_message", "There is already an existing team-activity mapping.");
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
 		} catch (Exception exception) {
 			handleException(request, response, exception, true);
 		}

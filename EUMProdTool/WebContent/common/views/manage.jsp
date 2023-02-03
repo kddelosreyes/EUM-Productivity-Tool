@@ -103,17 +103,14 @@
 		<br>
 		<div class="container" style="padding-bottom 100px; min-height:100%;">
 			<div class="row">
-				<div class="col"></div>
-				<div class="col-9">
+				<div class="col">
 					<div class="alert alert-success text-center" id="date_time">
 						Date and Time
 					</div>
 				</div>
-				<div class="col"></div>
 			</div>
 			<div class="row">
-				<div class="col"></div>
-				<div class="col-9">
+				<div class="col">
 					<div class="tab-content" id="pills-tabContent">
 						<div class="tab-pane fade show active" id="pills-home-div" role="tabpanel"
 							aria-labelledby="pills-home" tabindex="0">
@@ -149,7 +146,6 @@
 						</div>
 					</div>
 				</div>
-				<div class="col"></div>
 			</div>
 			<br>
 		</div>
@@ -205,27 +201,35 @@
 			
 			<%
 				String lastPage = (String) session.getAttribute("last_page");
-				String message = (String) session.getAttribute("message");
+				String message = (session.getAttribute("message") == null ? "" : (String) session.getAttribute("message"));
+				String errorMessage = (session.getAttribute("error_message") == null ? "" : (String) session.getAttribute("error_message"));
 			%>
 			
 			var jsLastPage = '<%= lastPage %>';
 			var jsMessage = '<%= message %>';
+			var jsErrorMessage = '<%= errorMessage %>';
 			console.log(jsLastPage);
 			
 			if (jsLastPage === 'REPORT') {
 				$("#pills-reports").click();
-				showSuccessMessage(jsMessage);
 			} else if (jsLastPage === 'ANALYST') {
 				$("#pills-entities-analysts").click();
-				showSuccessMessage(jsMessage);
 			} else if (jsLastPage === 'ACTIVITY') {
 				$("#pills-entities-activities").click();
+			} else if (jsLastPage === 'TEAM') {
+				$("#pills-entities-teams").click();
+			}
+			
+			if (jsMessage) {
 				showSuccessMessage(jsMessage);
+			} else if (jsErrorMessage) {
+				showErrorMessage(jsErrorMessage);
 			}
 			
 			<%
 				session.removeAttribute("last_page");
 				session.removeAttribute("message");
+				session.removeAttribute("error_message");
 			%>
 			
 			/*
@@ -335,27 +339,7 @@
 			
 			$('#activities_table').DataTable({
 				"ordering" : false,
-		        fixedHeader: true,
-		        initComplete: function () {
-		            this.api()
-		            	.columns()
-		                .every(function () {
-		                    var column = this;
-		                    var select = $('<br><select><option value=""></option></select>')
-		                        .appendTo($(column.header()))
-		                        .on('change', function () {
-		                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
-		                            column.search(val ? '^' + val + '$' : '', true, false).draw();
-		                        });
-		                    column
-		                        .data()
-		                        .unique()
-		                        .sort()
-		                        .each(function (d, j) {
-		                            select.append('<option value="' + d + '">' + d + '</option>');
-		                        });
-		                });
-		        }
+				autoWidth : true
 			});
 			
 			$('#fields_table').DataTable({
@@ -365,27 +349,7 @@
 			
 			$('#activity_field_map_table').DataTable({
 				"ordering" : false,
-		        fixedHeader: true,
-		        initComplete: function () {
-		            this.api()
-		            	.columns()
-		                .every(function () {
-		                    var column = this;
-		                    var select = $('<br><select><option value=""></option></select>')
-		                        .appendTo($(column.header()))
-		                        .on('change', function () {
-		                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
-		                            column.search(val ? '^' + val + '$' : '', true, false).draw();
-		                        });
-		                    column
-		                        .data()
-		                        .unique()
-		                        .sort()
-		                        .each(function (d, j) {
-		                            select.append('<option value="' + d + '">' + d + '</option>');
-		                        });
-		                });
-		        }
+				autoWidth : true
 			});
 			
 			/*
