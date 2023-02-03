@@ -75,4 +75,15 @@ public class AnalystService extends Service {
 		return resultSet.getInt(1) > 0;
 	}
 	
+	public Integer updateAnalystActive(String analystId, Integer isActive) throws SQLException {
+		String sql = "UPDATE " + getTableName() + " "
+				+ "SET is_active = ?1 "
+				+ "WHERE uuid = ?2";
+		Query query = new Query(sql);
+		query.params(isActive, analystId);
+		
+		int affectedRows = executeUpdate(query.getQuery());
+		return affectedRows;
+	}
+	
 }

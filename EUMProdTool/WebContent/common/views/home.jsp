@@ -84,14 +84,15 @@
 					<div class="card">
 						<h5 class="card-header"><b>Tasks List</b></h5>
 						<div class="card-body">
-							<table id="analyst_activity" class="table table-striped" style="width:100%;">
+							<table id="analyst_activity_${analyst.id}" class="table table-striped" style="width:100%;">
 								<thead>
 						            <tr>
+						                <th>Aux Type</th>
 						                <th>Activity</th>
-						                <th>Productive</th>
-						                <th>Other Productive</th>
-						                <th>Non-Productive</th>
-						                <th>Minutes</th>
+						                <th>Start Time</th>
+						                <th>End Time</th>
+						                <th>Time</th>
+						                <th>Remarks</th>
 						                <th>Actions</th>
 						            </tr>
 						        </thead>
@@ -106,25 +107,22 @@
 											<c:param name="analyst_activity_id" value="${analystActivity.id}" />
 										</c:url>
 						                <tr style="border-top-left-radius: 10px;">
-						                	<td>${analystActivity.activity.name}</td>
 											<c:choose>
 											    <c:when test="${analystActivity.activity.activityTypeId == 1}">
-											    	<td>${analystActivity.startTime.format(DateTimeFormatter.ofPattern("hh:mm a"))} - ${analystActivity.endTime.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
-											    	<td></td>
-											    	<td></td>
+											    	<td>Productive</td>
 											    </c:when>
 											    <c:when test="${analystActivity.activity.activityTypeId == 2}">
-											    	<td></td>
-											    	<td>${analystActivity.startTime.format(DateTimeFormatter.ofPattern("hh:mm a"))} - ${analystActivity.endTime.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
-											    	<td></td>
+											    	<td>Other Productive</td>
 											    </c:when>
 											    <c:otherwise>
-											    	<td></td>
-											    	<td></td>
-											    	<td>${analystActivity.startTime.format(DateTimeFormatter.ofPattern("hh:mm a"))} - ${analystActivity.endTime.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
+											    	<td>Non-Productive</td>
 											    </c:otherwise>
 											</c:choose>
-											<td>${analystActivity.minutes}</td>
+											<td>${analystActivity.activity.name}</td>
+											<td>${analystActivity.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}</td>
+											<td>${analystActivity.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}</td>
+											<td>${analystActivity.timeMinutes}</td>
+											<td>Remarks</td>
 											<td>
 												<div class="input-group">
 													<c:if test="${analystActivity.activity.activityTypeId == 1}">
@@ -139,14 +137,15 @@
 									</c:forEach>
 						        </tbody>
 						        <tfoot>
-					            <tr>
-					                <th>Activity</th>
-						            <th>Productive</th>
-						            <th>Other Productive</th>
-						            <th>Non-Productive</th>
-						            <th>Minutes</th>
-						            <th>Actions</th>
-					            </tr>
+						            <tr>
+						                <th>Aux Type</th>
+						                <th>Activity</th>
+						                <th>Start Time</th>
+						                <th>End Time</th>
+						                <th>Time</th>
+						                <th>Remarks</th>
+						                <th>Actions</th>
+					            	</tr>
 			        			</tfoot>
 							</table>
 						</div>
@@ -253,9 +252,17 @@
 	
 	<script>
 	$(document).ready(function () {
-	    $('#analyst_activity').DataTable({
+		var id = ${analyst.id};
+	    $('#analyst_activity_' + id).DataTable({
 	    	"ordering" : false,
-	    	"bFilter" : false
+	    	"bFilter" : false,
+	    	"bStateSave": true,
+	        "fnStateSave": function (oSettings, oData) {
+	            localStorage.setItem('table_analyst_activity_table', JSON.stringify(oData));
+	        },
+	        "fnStateLoad": function (oSettings) {
+	            return JSON.parse(localStorage.getItem('table_analyst_activity_table'));
+	        }
 	    });
 	});
 	</script>

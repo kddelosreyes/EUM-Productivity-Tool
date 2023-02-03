@@ -16,7 +16,8 @@
 					<tr>
 						<th>Name</th>
 						<th>Role</th>
-						<th>Time In/Time Out</th>
+						<th>Time In</th>
+						<th>Time Out</th>
 						<th>Shift Schedule</th>
 						<th>Remarks</th>
 					</tr>
@@ -26,7 +27,8 @@
 						<tr>
 							<td>${analystDetail.analyst.firstName} ${analystDetail.analyst.lastName}</td>
 							<td>${analystDetail.analyst.role}</td>
-							<td>${analystDetail.attendance.timeIn.format(DateTimeFormatter.ofPattern("hh:mm a"))} / ${analystDetail.attendance.timeOut.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
+							<td>${analystDetail.attendance.timeIn.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
+							<td>${analystDetail.attendance.timeOut.format(DateTimeFormatter.ofPattern("hh:mm a"))}</td>
 							<td>${analystDetail.shiftSchedule.name}</td>
 							<td>
 								<c:choose>
@@ -56,7 +58,8 @@
 					<tr>
 						<th>Name</th>
 						<th>Role</th>
-						<th>Time In/Time Out</th>
+						<th>Time In</th>
+						<th>Time Out</th>
 						<th>Shift Schedule</th>
 						<th>Remarks</th>
 					</tr>

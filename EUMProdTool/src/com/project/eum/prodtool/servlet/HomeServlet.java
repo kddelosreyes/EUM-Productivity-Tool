@@ -179,7 +179,7 @@ public class HomeServlet extends HttpServlet {
 	}
 	
 	protected void startActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
+		/*Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
 		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
 		
 		try {
@@ -216,7 +216,16 @@ public class HomeServlet extends HttpServlet {
 			}
 		} catch (SQLException exc) {
 			exc.printStackTrace();
-		}
+		}*/
+		
+		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
+		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
+		
+		request.setAttribute("analyst_id", analystId);
+		request.setAttribute("activity_id", activityId);
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/view");
+		dispatcher.forward(request, response);
 	}
 	
 	protected void endActivity(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

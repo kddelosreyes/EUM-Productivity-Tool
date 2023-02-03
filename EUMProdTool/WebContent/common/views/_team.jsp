@@ -212,12 +212,12 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="create_analyst_team_form" action="<%=request.getContextPath()%>/#" method="post">
+							<form id="create_analyst_team_form" action="<%=request.getContextPath()%>/manage" method="post">
 								<input type="hidden" name="command" value="CREATE_ANALYST_TEAM" />
 								<div class="form-floating mb-3">
 									<select	class="form-select" id="analyst_team_analyst" 
 										name="analyst_team_analyst" style="display: inline">
-										<c:forEach items="${analysts}" var="analyst">
+										<c:forEach items="${active_analysts}" var="analyst">
 											<option value="${analyst.id}">${analyst.firstName} ${analyst.lastName}</option>
 										</c:forEach>
 									</select>
@@ -233,7 +233,7 @@
 									<label for="analyst_team_team">Team</label>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="button" class="btn btn-primary" id="save_analyst_team" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="submit" class="btn btn-primary" id="save_analyst_team" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>

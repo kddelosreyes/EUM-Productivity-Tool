@@ -102,6 +102,12 @@ public class ManageServlet extends AppServlet {
 			case "CREATE_ACTIVITY_FIELD_MAP":
 				createActivityFieldMap(request, response);
 				break;
+			case "ACTIVATE_ANALYST":
+				activateAnalyst(request, response);
+				break;
+			case "DEACTIVATE_ANALYST":
+				deactivateAnalyst(request, response);
+				break;
 			default:
 				defaultAction(request, response);
 			}
@@ -156,6 +162,7 @@ public class ManageServlet extends AppServlet {
 		request.setAttribute("teams", teamTabDetails.getTeams());
 		request.setAttribute("analyst_teams", teamTabDetails.getAnalystTeams());
 		request.setAttribute("team_activities", teamTabDetails.getActivityTeams());
+		request.setAttribute("active_analysts", teamTabDetails.getAnalysts());
 		/*
 		 * Team - End
 		 * */
@@ -338,6 +345,46 @@ public class ManageServlet extends AppServlet {
 				HttpSession session = request.getSession(false);
 				session.setAttribute("last_page", "ACTIVITY");
 				session.setAttribute("message", "Activity-field mapping successfully created.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void activateAnalyst(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String analystId = request.getParameter("analyst_id");
+			
+			int affectedRows = analystService.updateAnalystActive(analystId, 1);
+			
+			if (affectedRows > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ANALYST");
+				session.setAttribute("message", "Analyst is activated.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} else {
+				throw new RuntimeException("There is an error on creating a new activity-field mapping.");
+			}
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
+		}
+	}
+	
+	private void deactivateAnalyst(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			String analystId = request.getParameter("analyst_id");
+			
+			int affectedRows = analystService.updateAnalystActive(analystId, 0);
+			
+			if (affectedRows > 0) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "ANALYST");
+				session.setAttribute("message", "Analyst is deactivated.");
 				
 				response.sendRedirect(request.getContextPath() + "/manage");
 			} else {

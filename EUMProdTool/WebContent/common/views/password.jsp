@@ -119,7 +119,7 @@
 						.html(
 								"<i class='bi bi-exclamation-triangle'></i> Code must be filled.");
 				return false;
-			} else if (validateCaptcha > 0 || recaptcha.length > 6) {
+			} else if (validateCaptcha > 0 || recaptcha.length > 9) {
 				$("#feedback").css("visibility", "visible");
 				$("#feedback")
 						.html(

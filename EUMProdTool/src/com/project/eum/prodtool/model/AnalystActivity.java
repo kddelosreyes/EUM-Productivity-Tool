@@ -1,6 +1,8 @@
 package com.project.eum.prodtool.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.utils.DateTimeUtils;
@@ -21,6 +23,8 @@ public class AnalystActivity extends Entity {
 	private LocalDateTime updatedDate;
 	
 	private Long minutes;
+	private String timeMinutes;
+	
 	
 	public AnalystActivity() {
 		super();
@@ -84,6 +88,12 @@ public class AnalystActivity extends Entity {
 		this.minutes = DateTimeUtils.minutesInBetween(startTime, endTime);
 		
 		return minutes;
+	}
+	
+	public String getTimeMinutes() {
+		return LocalTime.MIN.plus( 
+			    Duration.ofMinutes(getMinutes())
+			).toString();
 	}
 
 }

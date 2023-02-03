@@ -37,6 +37,14 @@
 						</thead>
 						<tbody>
 							<c:forEach items="${analysts}" var="analyst">
+								<c:url var="activate_analyst" value="manage">
+									<c:param name="command" value="ACTIVATE_ANALYST" />
+									<c:param name="analyst_id" value="${analyst.uuid}" />
+								</c:url>
+								<c:url var="deactivate_analyst" value="manage">
+									<c:param name="command" value="DEACTIVATE_ANALYST" />
+									<c:param name="analyst_id" value="${analyst.uuid}" />
+								</c:url>
 								<tr>
 									<td>${analyst.firstName}</td>
 									<td>${analyst.middleName}</td>
@@ -45,19 +53,19 @@
 									<td>${analyst.analystLogin.username}</td>
 									<td>
 										<c:if test="${analyst.isActive}">
-											Active
+											<span class="badge bg-success">Active</span>
 										</c:if>
 										<c:if test="${not analyst.isActive}">
-											Inactive
+											<span class="badge bg-danger">Inactive</span>
 										</c:if>
 									</td>
 									<td>
 										<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>
 										<c:if test="${analyst.isActive}">
-											<a href="#" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
+											<a href="${deactivate_analyst}" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
 										</c:if>
 										<c:if test="${not analyst.isActive}">
-											<a href="#" class="btn btn-outline-success btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Activate"><i class="bi bi-unlock"></i></a>
+											<a href="${activate_analyst}" class="btn btn-outline-success btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Activate"><i class="bi bi-unlock"></i></a>
 										</c:if>
 									</td>
 								</tr>

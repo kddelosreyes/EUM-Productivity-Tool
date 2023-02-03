@@ -2,6 +2,7 @@ package com.project.eum.prodtool.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,16 +98,30 @@ public class ViewServlet extends HttpServlet {
 	
 	protected void defaultAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Integer analystActivityId = (Integer) request.getAttribute("analyst_activity_id");
-		if (analystActivityId == null) {
-			analystActivityId = Integer.parseInt(request.getParameter("analyst_activity_id"));
-		}
+		Integer analystId = (Integer) request.getAttribute("analyst_id");
+		Integer activityId = (Integer) request.getAttribute("activity_id");
 		
 		try {
-			AnalystActivity analystActivity = (AnalystActivity) analystActivityService.getEntityById(analystActivityId);
-			Activity activity = (Activity) activityService.getEntityById((Integer) analystActivity.get(AnalystActivityField.activityId));
-			List<FormField> fields = formFieldService.getFormFieldsByActivityId((Integer) analystActivity.get(AnalystActivityField.activityId));
-			System.out.println(fields);
+			AnalystActivity analystActivity = new AnalystActivity();
+			Activity activity = null;
+			List<FormField> fields = null;
 			
+			if (analystActivityId == null) {				
+				LocalDateTime now = LocalDateTime.now();
+				analystActivity.set(AnalystActivityField.id, 0)
+						.set(AnalystActivityField.startTime, now)
+						.set(AnalystActivityField.createdDate, now)
+						.set(AnalystActivityField.updatedDate, now);
+				activity = (Activity) activityService.getEntityById(activityId);
+				fields = formFieldService.getFormFieldsByActivityId(activityId);
+			} else {
+				analystActivity = (AnalystActivity) analystActivityService.getEntityById(analystActivityId);
+				activity = (Activity) activityService.getEntityById((Integer) analystActivity.get(AnalystActivityField.activityId));
+				fields = formFieldService.getFormFieldsByActivityId((Integer) analystActivity.get(AnalystActivityField.activityId));
+				analystId = analystActivity.getAnalystId();
+				activityId = analystActivity.getActivityId();
+			}
+						
 			List<Entity> fieldValues = analystActivityFieldDetailService.getEntitiesByColumn(AnalystActivityFieldDetailColumn.ANALYST_ACTIVITY_ID, analystActivityId);
 			
 			if (!fieldValues.isEmpty()) {
@@ -123,6 +138,8 @@ public class ViewServlet extends HttpServlet {
 			request.setAttribute("activity_name", (String) activity.get(ActivityField.NAME));
 			request.setAttribute("analyst_activity", analystActivity);
 			request.setAttribute("fields", fields);
+			request.setAttribute("analyst_id", analystId);
+			request.setAttribute("activity_id", activityId);
 			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("common/views/view.jsp");
 			dispatcher.forward(request, response);
@@ -133,10 +150,23 @@ public class ViewServlet extends HttpServlet {
 	
 	protected void saveAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Integer analystActivityId = Integer.parseInt(request.getParameter("analyst_activity_id"));
+		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
+		Integer activityId = Integer.parseInt(request.getParameter("activity_id"));
 		
 		try {
-			AnalystActivity analystActivity = (AnalystActivity) analystActivityService.getEntityById(analystActivityId);
-			List<FormField> fields = formFieldService.getFormFieldsByActivityId((Integer) analystActivity.get(AnalystActivityField.activityId));
+			AnalystActivity analystActivity = null;
+			List<FormField> fields = null;
+			Integer trueKey = null;
+			
+			if (analystActivityId == 0) {
+				trueKey = analystActivityService.insertNewAnalystActivity(analystId, activityId);
+				fields = formFieldService.getFormFieldsByActivityId(activityId);
+			} else {
+				analystActivity = (AnalystActivity) analystActivityService.getEntityById(analystActivityId);
+				fields = formFieldService.getFormFieldsByActivityId((Integer) analystActivity.get(AnalystActivityField.activityId));
+			}
+			
+			
 			
 			Map<Integer, String> fieldValues = new HashMap<Integer, String>();
 			for (FormField field : fields) {
@@ -150,6 +180,10 @@ public class ViewServlet extends HttpServlet {
 			
 			Set<Integer> keys = fieldValues.keySet();
 			Iterator<Integer> keyIterator = keys.iterator();
+			if (trueKey != null) {
+				analystActivityId = trueKey;
+			}
+			
 			boolean isValid = true;
 			while (keyIterator.hasNext()) {
 				Integer fieldId = keyIterator.next();

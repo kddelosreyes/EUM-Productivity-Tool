@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.project.eum.prodtool.base.Entity;
-import com.project.eum.prodtool.model.column.AnalystColumn;
 import com.project.eum.prodtool.service.AnalystService;
 
 public class TabDetails_Analyst {
@@ -15,7 +14,7 @@ public class TabDetails_Analyst {
 	
 	public TabDetails_Analyst() {
 		try {
-			analysts = analystService.getEntitiesByColumn(AnalystColumn.IS_ACTIVE, 1);
+			analysts = analystService.getAll();
 		} catch(SQLException exc) {
 			exc.printStackTrace();
 		}
