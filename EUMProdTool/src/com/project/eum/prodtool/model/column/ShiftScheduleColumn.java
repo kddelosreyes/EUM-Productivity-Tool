@@ -8,6 +8,7 @@ public enum ShiftScheduleColumn implements Column {
 	NAME,
 	START_TIME,
 	END_TIME,
+	IS_NIGHT_SHIFT,
 	CREATED_DATE,
 	UPDATED_DATE,
 	UUID;

@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="teams_table" class="table table-striped nowrap" style="width:100%">
+					<table id="teams_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -71,7 +71,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="analyst_team_table" class="table table-striped nowrap" style="width:100%">
+					<table id="analyst_team_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -122,7 +122,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="team_activity_table" class="table table-striped nowrap" style="width:100%">
+					<table id="team_activity_table" class="table table-striped" style="width:100%">
 						<thead>
 							<tr>
 								<th>#</th>

@@ -12,6 +12,7 @@ public class AnalystShiftSchedule extends Entity {
 	private ShiftSchedule shiftSchedule;
 	private LocalDate fromDate;
 	private LocalDate toDate;
+	private String restDays;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	
@@ -38,6 +39,10 @@ public class AnalystShiftSchedule extends Entity {
 
 	public LocalDate getToDate() {
 		return toDate;
+	}
+	
+	public String getRestDays() {
+		return restDays;
 	}
 
 	public LocalDateTime getCreatedDate() {

@@ -10,6 +10,7 @@
 	<div class="card">
 		<div class="card-body">
 			<h5><b>Attendance Summary</b></h5>
+			<br>
 			<div class="row">
 				<div class="col-4">
 					<div class="card text-center">
@@ -91,6 +92,7 @@
 	<div class="card">
 		<div class="card-body">
 			<h5><b>Shift Schedules</b></h5>
+			<br>
 			<div class="row">
 				<div class="col-12">
 					To Do
@@ -99,74 +101,68 @@
 		</div>
 	</div>
 	<br>
-	<div class="card">
-		<div class="card-body">
-			<h5><b>Attendance Logs</b></h5>
-			<div class="row">
-				<div class="col-12">
-					<c:if test="${not empty attendance_logs}">
-						<ol class="list-group">
-							<c:forEach items="${attendance_logs}" var="attendanceLog">
-								<li class="list-group-item d-flex justify-content-between align-items-start">
-									<div class="ms-2 me-auto">
-										<small>${attendanceLog.time.format(DateTimeFormatter.ofPattern("hh:mm a"))}</small>
-										<div class="fw-bold">
-											${attendanceLog.name} has already logged.
-										</div>
-								    </div>
-								    <c:if test="${attendanceLog.type == 'IN'}">
-								    	<span class="badge bg-success rounded-pill">${attendanceLog.type}</span>
-								    </c:if>
-								    <c:if test="${attendanceLog.type == 'OUT'}">
-								    	<span class="badge bg-danger rounded-pill">${attendanceLog.type}</span>
-								    </c:if>
-								</li>
-							</c:forEach>
-						</ol>
-					</c:if>
-					<c:if test="${empty attendance_logs}">
-						<div class="text-center">
-							<small>No attendance logs for today</small>
-						</div>
-					</c:if>
-				</div>
+	<div class="card-group">
+		<div class="card">
+			<div class="card-body">
+				<h5><b>Attendance Logs</b></h5>
+				<br>
+				<c:if test="${not empty attendance_logs}">
+					<ol class="list-group">
+						<c:forEach items="${attendance_logs}" var="attendanceLog">
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								<div class="ms-2 me-auto">
+									<small>${attendanceLog.time.format(DateTimeFormatter.ofPattern("hh:mm a"))}</small>
+									<div class="fw-bold">
+										${attendanceLog.name} has already logged.
+									</div>
+							    </div>
+							    <c:if test="${attendanceLog.type == 'IN'}">
+							    	<span class="badge bg-success rounded-pill">${attendanceLog.type}</span>
+							    </c:if>
+							    <c:if test="${attendanceLog.type == 'OUT'}">
+							    	<span class="badge bg-danger rounded-pill">${attendanceLog.type}</span>
+							    </c:if>
+							</li>
+						</c:forEach>
+					</ol>
+				</c:if>
+				<c:if test="${empty attendance_logs}">
+					<div class="text-center">
+						<small>No attendance logs for today</small>
+					</div>
+				</c:if>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-body">
+				<h5><b>Activity Logs</b></h5>
+				<br>
+				<c:if test="${not empty activity_logs}">
+					<ol class="list-group">
+						<c:forEach items="${activity_logs}" var="activityLog">
+							<li class="list-group-item d-flex justify-content-between align-items-start">
+								<div class="ms-2 me-auto">
+									<small>${activityLog.time.format(DateTimeFormatter.ofPattern("hh:mm a"))}</small>
+									<div class="fw-bold">
+										${activityLog.name} has ${fn:toLowerCase(activityLog.type)}ed ${activityLog.activity}.
+									</div>
+							    </div>
+							    <c:if test="${activityLog.type == 'START'}">
+							    	<span class="badge bg-success rounded-pill">${activityLog.type}</span>
+							    </c:if>
+							    <c:if test="${activityLog.type == 'END'}">
+							    	<span class="badge bg-danger rounded-pill">${activityLog.type}</span>
+							    </c:if>
+							</li>
+						</c:forEach>
+					</ol>
+				</c:if>
+				<c:if test="${empty activity_logs}">
+					<div class="text-center">
+						<small>No activity logs for today</small>
+					</div>
+				</c:if>
 			</div>
 		</div>
 	</div>
-	<br>
-	<div class="card">
-		<div class="card-body">
-			<h5><b>Activity Logs</b></h5>
-			<div class="row">
-				<div class="col-12">
-					<c:if test="${not empty activity_logs}">
-						<ol class="list-group">
-							<c:forEach items="${activity_logs}" var="activityLog">
-								<li class="list-group-item d-flex justify-content-between align-items-start">
-									<div class="ms-2 me-auto">
-										<small>${activityLog.time.format(DateTimeFormatter.ofPattern("hh:mm a"))}</small>
-										<div class="fw-bold">
-											${activityLog.name} has ${fn:toLowerCase(activityLog.type)}ed ${activityLog.activity}.
-										</div>
-								    </div>
-								    <c:if test="${activityLog.type == 'START'}">
-								    	<span class="badge bg-success rounded-pill">${activityLog.type}</span>
-								    </c:if>
-								    <c:if test="${activityLog.type == 'END'}">
-								    	<span class="badge bg-danger rounded-pill">${activityLog.type}</span>
-								    </c:if>
-								</li>
-							</c:forEach>
-						</ol>
-					</c:if>
-					<c:if test="${empty activity_logs}">
-						<div class="text-center">
-							<small>No activity logs for today</small>
-						</div>
-					</c:if>
-				</div>
-			</div>
-		</div>
-	</div>
-
 </html>

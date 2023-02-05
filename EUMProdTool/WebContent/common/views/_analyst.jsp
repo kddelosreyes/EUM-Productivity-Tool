@@ -23,7 +23,7 @@
 			<br>
 			<div class="row">
 				<div class="col-12">
-					<table id="analysts_table" class="table table-striped" style="width:100%">
+					<table id="analysts_table" class="table table-striped nowrap" style="width:100%">
 						<thead>
 							<tr>
 								<th>First Name</th>

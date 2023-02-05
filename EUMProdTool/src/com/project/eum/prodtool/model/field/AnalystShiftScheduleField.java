@@ -14,6 +14,7 @@ public enum AnalystShiftScheduleField implements EntityField {
 	shiftSchedule(ShiftSchedule.class),
 	fromDate(LocalDate.class),
 	toDate(LocalDate.class),
+	restDays(String.class),
 	createdDate(LocalDateTime.class),
 	updatedDate(LocalDateTime.class);
 	

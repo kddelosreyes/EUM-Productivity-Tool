@@ -10,6 +10,7 @@ public class ShiftSchedule extends Entity {
 	private String name;
 	private LocalTime startTime;
 	private LocalTime endTime;
+	private Boolean isNightShift;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	
@@ -32,6 +33,10 @@ public class ShiftSchedule extends Entity {
 
 	public LocalTime getEndTime() {
 		return endTime;
+	}
+	
+	public Boolean getIsNightShift() {
+		return isNightShift;
 	}
 
 	public LocalDateTime getCreatedDate() {

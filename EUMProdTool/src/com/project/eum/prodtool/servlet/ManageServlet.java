@@ -32,6 +32,7 @@ import com.project.eum.prodtool.view.TabDetails_Analyst;
 import com.project.eum.prodtool.view.TabDetails_Attendance;
 import com.project.eum.prodtool.view.TabDetails_Home;
 import com.project.eum.prodtool.view.TabDetails_Report;
+import com.project.eum.prodtool.view.TabDetails_ShiftSchedule;
 import com.project.eum.prodtool.view.TabDetails_Team;
 
 /**
@@ -189,6 +190,16 @@ public class ManageServlet extends AppServlet {
 		request.setAttribute("analystDetails", attendanceTabDetails.getAnalystDetails());
 		/*
 		 * Attendance - End
+		 * */
+		
+		/*
+		 * Shift Schedule - Start
+		 * */
+		TabDetails_ShiftSchedule shiftScheduleTabDetails = new TabDetails_ShiftSchedule();
+		request.setAttribute("shift_schedules", shiftScheduleTabDetails.getShiftSchedules());
+		request.setAttribute("analyst_shift_schedules", shiftScheduleTabDetails.getAnalystShiftSchedules());
+		/*
+		 * Shift Schedule - End
 		 * */
 		
 		/*

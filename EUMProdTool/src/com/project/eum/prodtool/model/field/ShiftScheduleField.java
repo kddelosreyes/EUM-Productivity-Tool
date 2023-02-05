@@ -11,6 +11,7 @@ public enum ShiftScheduleField implements EntityField {
 	name(String.class),
 	startTime(LocalTime.class),
 	endTime(LocalTime.class),
+	isNightShift(Boolean.class),
 	createdDate(LocalDateTime.class),
 	updatedDate(LocalDateTime.class),
 	uuid(String.class);

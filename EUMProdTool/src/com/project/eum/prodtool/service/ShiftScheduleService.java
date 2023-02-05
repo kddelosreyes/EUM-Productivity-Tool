@@ -26,6 +26,7 @@ public class ShiftScheduleService extends Service {
 		String name = resultSet.getString(ShiftScheduleColumn.NAME.getColumnName());
 		LocalTime startTime = DateTimeUtils.convertTimeToLocalTime(resultSet.getTime(ShiftScheduleColumn.START_TIME.getColumnName()));
 		LocalTime endTime = DateTimeUtils.convertTimeToLocalTime(resultSet.getTime(ShiftScheduleColumn.END_TIME.getColumnName()));
+		Boolean isNightShift = resultSet.getInt(ShiftScheduleColumn.IS_NIGHT_SHIFT.getColumnName()) == 1;
 		LocalDateTime createdDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(ShiftScheduleColumn.CREATED_DATE.getColumnName()));
 		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(ShiftScheduleColumn.UPDATED_DATE.getColumnName()));
 		String uuid = resultSet.getString(ShiftScheduleColumn.UUID.getColumnName());
@@ -35,6 +36,7 @@ public class ShiftScheduleService extends Service {
 				.set(ShiftScheduleField.name, name)
 				.set(ShiftScheduleField.startTime, startTime)
 				.set(ShiftScheduleField.endTime, endTime)
+				.set(ShiftScheduleField.isNightShift, isNightShift)
 				.set(ShiftScheduleField.createdDate, createdDate)
 				.set(ShiftScheduleField.updatedDate, updatedDate)
 				.set(ShiftScheduleField.uuid, uuid);

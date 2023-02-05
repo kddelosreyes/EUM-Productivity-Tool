@@ -134,7 +134,7 @@
 						</div>
 						<div class="tab-pane fade" id="pills-attendance-shift-schedule-div" role="tabpanel"
 							aria-labelledby="#pills-attendance-shift-schedule" tabindex="0" style="width:100%;">
-							Attendance / Shift Schedule
+							<jsp:include page="_shiftschedule.jsp" />
 						</div>
 						<div class="tab-pane fade" id="pills-attendance-leaves-div" role="tabpanel"
 							aria-labelledby="#pills-attendance-leaves" tabindex="0">
@@ -369,6 +369,42 @@
 				"ordering" : false,
 				autoWidth : true
 			});
+			
+			/*
+			 *	Shift Schedules
+			 */
+			 $('#shift_schedules_table').DataTable({
+				 "ordering" : false,
+				 autoWidth : true
+			 });
+			
+			$('#analyst_shift_schedules_table').DataTable({
+				"ordering" : false,
+				 autoWidth : true
+			});
+			
+			$('#shift_schedule_start_time').change(function() {
+				checkNightShift();
+			});
+			
+			$('#shift_schedule_end_time').change(function() {
+				checkNightShift();
+			});
+			
+			function checkNightShift() {
+				var startTime = $('#shift_schedule_start_time');
+				var endTime = $('#shift_schedule_end_time');
+				
+				if (startTime.val() && endTime.val()) {
+					var startDate = new Date("1/1/1900 " + startTime.val());
+					var endDate = new Date("1/1/1900 " + endTime.val());
+					if (startDate > endDate) {
+						$("#shift_schedule_night_shift").prop('checked', true);
+					} else {
+						$("#shift_schedule_night_shift").prop('checked', false);
+					}
+				}
+			}
 			
 			/*
 			 *	Report
