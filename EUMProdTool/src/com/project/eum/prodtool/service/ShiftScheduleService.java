@@ -62,5 +62,16 @@ public class ShiftScheduleService extends Service {
 			return null;
 		}
 	}
+	
+	public Integer insertNewShiftSchedule(String name, String startTime, String endTime,
+			Integer isNightShift) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + "(name, start_time, end_time, is_night_shift, uuid) "
+				+ "VALUES(?1, ?2, ?3, ?4, uuid())" ;
+		Query query = new Query(sql);
+		query.params(name, startTime, endTime, isNightShift);
+		
+		Integer key = executeUpdate(query.getQuery());
+		return key;
+	}
 
 }

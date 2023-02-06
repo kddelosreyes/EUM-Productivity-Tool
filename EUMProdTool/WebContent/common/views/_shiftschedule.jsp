@@ -171,7 +171,7 @@
 								</div>
 								<div class="form-check form-switch">
 									<input type="checkbox" class="form-check-input" id="shift_schedule_night_shift"
-										name="shift_schedule_night_shift" value="true" placeholder="Is Night Shift?" disabled>
+										name="shift_schedule_night_shift" value="1" placeholder="Is Night Shift?">
 									<label class="form-check-label" for="shift_schedule_night_shift">Is Night Shift?</label>
 								</div>
 								<br>
@@ -191,7 +191,7 @@
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalCenterTitle">Create Analyst - Team Mapping</h5>
+					<h5 class="modal-title" id="exampleModalCenterTitle">Create Analyst - Shift Schedule Mapping</h5>
 					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -199,28 +199,70 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<form id="create_analyst_team_form" action="<%=request.getContextPath()%>/manage" method="post">
-								<input type="hidden" name="command" value="CREATE_ANALYST_TEAM" />
+							<form id="create_analyst_team_form" action="<%=request.getContextPath()%>/manage" method="post" autocomplete="off">
+								<input type="hidden" name="command" value="CREATE_ANALYST_SHIFT_SCHEDULE" />
 								<div class="form-floating mb-3">
-									<select	class="form-select" id="analyst_team_analyst" 
-										name="analyst_team_analyst" style="display: inline">
+									<select	class="form-select" id="analyst_shift_schedule_analyst" 
+										name="analyst_shift_schedule_analyst" style="display: inline">
 										<c:forEach items="${active_analysts}" var="analyst">
 											<option value="${analyst.id}">${analyst.firstName} ${analyst.lastName}</option>
 										</c:forEach>
 									</select>
-									<label for="analyst_team_analyst">Analyst</label>
+									<label for="analyst_shift_schedule_analyst">Analyst</label>
 								</div>
 								<div class="form-floating mb-3">
-									<select	class="form-select" id="analyst_team_team" 
-										name="analyst_team_team" style="display: inline">
-										<c:forEach items="${teams}" var="team">
-											<option value="${team.id}">${team.name}</option>
+									<select	class="form-select" id="analyst_shift_schedule_shift" 
+										name="analyst_shift_schedule_shift" style="display: inline">
+										<c:forEach items="${shift_schedules}" var="shiftSchedule">
+											<option value="${shiftSchedule.id}">${shiftSchedule.name} (${shiftSchedule.startTime} - ${shiftSchedule.endTime})</option>
 										</c:forEach>
 									</select>
-									<label for="analyst_team_team">Team</label>
+									<label for="analyst_shift_schedule_shift">Shift Schedule</label>
+								</div>
+								<div class="row">
+									<div class="col">
+										<div class="form-floating mb-3">
+											<input type="text" class="form-control" id="analyst_shift_schedule_start_date"
+												name="analyst_shift_schedule_start_date" placeholder="Start Date" required/>
+											<label for="analyst_shift_schedule_start_date">Start Date</label>
+										</div>
+									</div>
+									<div class="col">
+										<div class="form-floating mb-3">
+											<input type="text" class="form-control" id="analyst_shift_schedule_end_date"
+												name="analyst_shift_schedule_end_date" placeholder="End Date" required/>
+											<label for="analyst_shift_schedule_end_date">End Date</label>
+										</div>
+									</div>
 								</div>
 								<div class="form-floating mb-3">
-									<button type="submit" class="btn btn-primary" id="save_analyst_team" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<small>Rest Days</small>
+									<br>
+									<div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+										<input type="checkbox" class="btn-check" id="btnSunday" name="analyst_shift_schedule_rest_day" value="Su" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnSunday">Sun</label>
+										
+										<input type="checkbox" class="btn-check" id="btnMonday" name="analyst_shift_schedule_rest_day" value="M" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnMonday">Mon</label>
+										
+										<input type="checkbox" class="btn-check" id="btnTuesday" name="analyst_shift_schedule_rest_day" value="Tu" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnTuesday">Tue</label>
+										
+										<input type="checkbox" class="btn-check" id="btnWednesday" name="analyst_shift_schedule_rest_day" value="W" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnWednesday">Wed</label>
+										
+										<input type="checkbox" class="btn-check" id="btnThursday" name="analyst_shift_schedule_rest_day" value="Th" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnThursday">Thu</label>
+										
+										<input type="checkbox" class="btn-check" id="btnFriday" name="analyst_shift_schedule_rest_day" value="F" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnFriday">Fri</label>
+										
+										<input type="checkbox" class="btn-check" id="btnSaturday" name="analyst_shift_schedule_rest_day" value="Sa" autocomplete="off">
+										<label class="btn btn-outline-success" for="btnSaturday">Sat</label>
+									</div>
+								</div>
+								<div class="form-floating mb-3">
+									<button type="submit" class="btn btn-primary" id="save_analyst_shift_schedule" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>

@@ -218,6 +218,8 @@
 				$("#pills-entities-activities").click();
 			} else if (jsLastPage === 'TEAM') {
 				$("#pills-entities-teams").click();
+			} else if (jsLastPage === 'SHIFT_SCHEDULE') {
+				$("#pills-attendance-shift-schedule").click();
 			}
 			
 			if (jsMessage) {
@@ -405,6 +407,63 @@
 					}
 				}
 			}
+			
+			$('#analyst_shift_schedule_start_date').datepicker();
+			$('#analyst_shift_schedule_start_date').change(function() {
+				var startDate = $('#analyst_shift_schedule_start_date');
+				var endDate = $('#analyst_shift_schedule_end_date');
+				if (endDate.val()) {
+					var startDateStr = startDate.val();
+					var endDateStr = endDate.val();
+					
+					var dateStart = new Date(startDateStr);
+					var dateEnd = new Date(endDateStr);
+					
+					console.log(dateStart + " " + dateEnd);
+					
+					if (dateStart > dateEnd) {
+						$("#save_analyst_shift_schedule").prop('disabled', true);
+						addClass(startDate, "is-invalid");
+						addClass(endDate, "is-invalid");
+					} else {
+						$("#save_analyst_shift_schedule").prop('disabled', false);
+						removeClass(startDate, "is-invalid");
+						removeClass(endDate, "is-invalid");
+					}
+				}
+			});
+			
+			$('#analyst_shift_schedule_end_date').datepicker();
+			$('#analyst_shift_schedule_end_date').change(function() {
+				var startDate = $('#analyst_shift_schedule_start_date');
+				var endDate = $('#analyst_shift_schedule_end_date');
+				if (startDate.val()) {
+					var startDateStr = startDate.val();
+					var endDateStr = endDate.val();
+					
+					var dateStart = new Date(startDateStr);
+					var dateEnd = new Date(endDateStr);
+					
+					console.log(dateStart + " " + dateEnd);
+					
+					if (dateStart > dateEnd) {
+						$("#save_analyst_shift_schedule").prop('disabled', true);
+						addClass(startDate, "is-invalid");
+						addClass(endDate, "is-invalid");
+					} else {
+						$("#save_analyst_shift_schedule").prop('disabled', false);
+						removeClass(startDate, "is-invalid");
+						removeClass(endDate, "is-invalid");
+					}
+				}
+			});
+			
+			$('input[type=checkbox]').on('change', function (e) {
+			    if ($('input[type=checkbox]:checked').length > 2) {
+			        $(this).prop('checked', false);
+			        alert("allowed only 3");
+			    }
+			});
 			
 			/*
 			 *	Report

@@ -45,6 +45,12 @@ public class DateTimeUtils {
 		return time.toLocalTime();
 	}
 	
+	public static LocalDate convertDateToLocalDate(Date date) {
+		return date.toInstant()
+			      .atZone(ZoneId.systemDefault())
+			      .toLocalDate();
+	}
+	
 	public static Long minutesInBetween(LocalDateTime start, LocalDateTime end) {
 		if (end == null) {
 			return 0L;
@@ -87,6 +93,16 @@ public class DateTimeUtils {
 	public static boolean isWeekend(LocalDate date) {
 		int dayOfWeek = date.get(ChronoField.DAY_OF_WEEK);
 		return dayOfWeek == 6 || dayOfWeek == 7;
+	}
+	
+	public static boolean hasOverlap(LocalDate firstInit, LocalDate firstEnd, LocalDate secondInit,
+			LocalDate secondEnd) {
+		if ((firstInit.isBefore(secondInit) && firstEnd.isBefore(secondInit) && firstInit.isBefore(secondEnd) && firstEnd.isBefore(secondEnd)) ||
+				(secondInit.isBefore(firstInit) && secondEnd.isBefore(firstInit) && secondInit.isBefore(firstEnd) && secondEnd.isBefore(firstEnd))) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 }

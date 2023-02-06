@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.project.eum.prodtool.base.Entity;
@@ -75,6 +76,23 @@ public class AnalystShiftScheduleService extends Service {
 		return shiftSchedules;
 	}
 	
+	public List<Entity> getShiftSchedulesByAnalystId(Integer analystId) throws SQLException {
+		List<Entity> analystShiftSchedules = new ArrayList<>();
+		
+		String sql = "SELECT * "
+				+ "FROM analyst_shift_schedule "
+				+ "WHERE analyst_id = ?1";
+		Query query = new Query(sql);
+		query.params(analystId);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		while (resultSet.next()) {
+			analystShiftSchedules.add(getResultSetEntity(resultSet));
+		}
+		
+		return analystShiftSchedules;
+	}
+	
 	public List<T_AnalystShiftSchedule> getAllShiftSchedulesForCurrentQuarter() throws SQLException {
 		List<T_AnalystShiftSchedule> shiftSchedules = new ArrayList<>();
 		
@@ -124,6 +142,18 @@ public class AnalystShiftScheduleService extends Service {
 		}
 		
 		return shiftSchedules;
+	}
+	
+	public Integer insertNewAnalystShiftSchedule(Integer analystId, Integer shiftScheduleId, Date fromDate,
+			Date toDate, String[] restDays) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + " (analyst_id, shift_schedule_id, from_date, to_date, rest_days) "
+				+ "VALUES(?1, ?2, ?3, ?4, ?5)";
+		Query query = new Query(sql);
+		query.params(analystId, shiftScheduleId, DateTimeUtils.toSqlDateString(fromDate),
+				DateTimeUtils.toSqlDateString(toDate), String.join(",", restDays));
+		
+		Integer key = executeUpdate(query.getQuery());
+		return key;
 	}
 
 }
