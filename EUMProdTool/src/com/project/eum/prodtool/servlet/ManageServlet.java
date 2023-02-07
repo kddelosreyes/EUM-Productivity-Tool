@@ -1,18 +1,21 @@
 package com.project.eum.prodtool.servlet;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.model.AnalystShiftSchedule;
@@ -45,6 +48,11 @@ import com.project.eum.prodtool.view.TabDetails_Team;
  * Servlet implementation class Manage
  */
 @WebServlet("/ManageServlet")
+@MultipartConfig(
+		fileSizeThreshold = 1024 * 1024 * 1,
+		maxFileSize = 1024 * 1024 * 10,
+		maxRequestSize = 1024 * 1024 * 100
+		)
 public class ManageServlet extends AppServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -137,6 +145,9 @@ public class ManageServlet extends AppServlet {
 				break;
 			case "CREATE_ANALYST_SHIFT_SCHEDULE":
 				createAnalystShiftSchedule(request, response);
+				break;
+			case "UPLOAD_ANALYST_SHIFT_SCHEDULE":
+				uploadAnalystShiftSchedule(request, response);
 				break;
 			default:
 				defaultAction(request, response);
@@ -571,44 +582,49 @@ public class ManageServlet extends AppServlet {
 		Date toDate = DateTimeUtils.toDateFormat(request.getParameter("analyst_shift_schedule_end_date"), DateTimeUtils.MMDDYYYY);
 		String[] restDaysOption = request.getParameterValues("analyst_shift_schedule_rest_day");
 		
-		System.out.println(analystId + " " + shiftScheduleId + " " + fromDate + " " + toDate + " " + Arrays.toString(restDaysOption));
-		
-		try {
-			List<Entity> currentShiftSchedules = analystShiftScheduleService.getShiftSchedulesByAnalystId(analystId);
-			
-			if (currentShiftSchedules.isEmpty()) {
-				insertNewAnalystShiftSchedule(request, response, analystId, shiftScheduleId, fromDate, toDate, restDaysOption);
-			} else {
-				boolean hasOverlap = false;
-				for (Entity shiftSchedule : currentShiftSchedules) {
-					AnalystShiftSchedule analystShiftSchedule = (AnalystShiftSchedule) shiftSchedule;
-					boolean isOverlap = DateTimeUtils.hasOverlap(
-							DateTimeUtils.convertDateToLocalDate(fromDate), DateTimeUtils.convertDateToLocalDate(toDate), 
-							analystShiftSchedule.getFromDate(), analystShiftSchedule.getToDate()
-							);
-					if (isOverlap) {
-						hasOverlap = isOverlap;
-						break;
-					}
-				}
-				
-				if (hasOverlap) {
-					HttpSession session = request.getSession(false);
-					session.setAttribute("last_page", "SHIFT_SCHEDULE");
-					session.setAttribute("error_message", "There is an overlapping shift schedule. Please check and try again.");
-					response.sendRedirect(request.getContextPath() + "/manage");
-				} else {
-					insertNewAnalystShiftSchedule(request, response, analystId, shiftScheduleId, fromDate, toDate, restDaysOption);
-				}
-			}
-		} catch (SQLException exception) {
+		if (restDaysOption == null || restDaysOption.length == 0) {
 			HttpSession session = request.getSession(false);
 			session.setAttribute("last_page", "SHIFT_SCHEDULE");
-			session.setAttribute("error_message", "There is already an existing shift schedule.");
-			
+			session.setAttribute("error_message", "There should be at least one rest day. Please try again.");
 			response.sendRedirect(request.getContextPath() + "/manage");
-		} catch (Exception exception) {
-			handleException(request, response, exception, true);
+		} else {
+			try {
+				List<Entity> currentShiftSchedules = analystShiftScheduleService.getShiftSchedulesByAnalystId(analystId);
+				
+				if (currentShiftSchedules.isEmpty()) {
+					insertNewAnalystShiftSchedule(request, response, analystId, shiftScheduleId, fromDate, toDate, restDaysOption);
+				} else {
+					boolean hasOverlap = false;
+					for (Entity shiftSchedule : currentShiftSchedules) {
+						AnalystShiftSchedule analystShiftSchedule = (AnalystShiftSchedule) shiftSchedule;
+						boolean isOverlap = DateTimeUtils.hasOverlap(
+								DateTimeUtils.convertDateToLocalDate(fromDate), DateTimeUtils.convertDateToLocalDate(toDate), 
+								analystShiftSchedule.getFromDate(), analystShiftSchedule.getToDate()
+								);
+						if (isOverlap) {
+							hasOverlap = isOverlap;
+							break;
+						}
+					}
+					
+					if (hasOverlap) {
+						HttpSession session = request.getSession(false);
+						session.setAttribute("last_page", "SHIFT_SCHEDULE");
+						session.setAttribute("error_message", "There is an overlapping shift schedule. Please check and try again.");
+						response.sendRedirect(request.getContextPath() + "/manage");
+					} else {
+						insertNewAnalystShiftSchedule(request, response, analystId, shiftScheduleId, fromDate, toDate, restDaysOption);
+					}
+				}
+			} catch (SQLException exception) {
+				HttpSession session = request.getSession(false);
+				session.setAttribute("last_page", "SHIFT_SCHEDULE");
+				session.setAttribute("error_message", "There is already an existing shift schedule.");
+				
+				response.sendRedirect(request.getContextPath() + "/manage");
+			} catch (Exception exception) {
+				handleException(request, response, exception, true);
+			}
 		}
 	}
 	
@@ -625,6 +641,76 @@ public class ManageServlet extends AppServlet {
 			response.sendRedirect(request.getContextPath() + "/manage");
 		} else {
 			throw new RuntimeException("There is an error on creating a new analyst-shift schedule mapping.");
+		}
+	}
+	
+	private void uploadAnalystShiftSchedule(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Part filePart = request.getPart("file_input");
+		String fileName = filePart.getSubmittedFileName();
+		for (Part part : request.getParts()) {
+			part.write("C:\\files\\" + fileName);
+		}
+		
+		try (BufferedReader br = new BufferedReader(new FileReader("C:\\files\\" + fileName))) {
+			String line = "";
+			int totalAddedRecords = 0, totalRecords = 0;
+			while ((line = br.readLine()) != null) {
+				String[] values = line.split(",");
+				Integer analystId = Integer.parseInt(values[0]);
+				Integer shiftScheduleId = Integer.parseInt(values[1]);
+				Date fromDate = DateTimeUtils.toDateFormat(values[2], DateTimeUtils.MMDDYYYY);
+				Date toDate = DateTimeUtils.toDateFormat(values[3], DateTimeUtils.MMDDYYYY);
+				String[] restDays = values[4].split(";");
+				
+				List<Entity> currentShiftSchedules = analystShiftScheduleService.getShiftSchedulesByAnalystId(analystId);
+				
+				if (restDays.length != 0) {
+					if (currentShiftSchedules.isEmpty()) {
+						int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, fromDate, toDate, restDays);
+						if (affectedRows > 0) {
+							totalAddedRecords++;
+						}
+					} else {
+						boolean hasOverlap = false;
+						for (Entity shiftSchedule : currentShiftSchedules) {
+							AnalystShiftSchedule analystShiftSchedule = (AnalystShiftSchedule) shiftSchedule;
+							boolean isOverlap = DateTimeUtils.hasOverlap(
+									DateTimeUtils.convertDateToLocalDate(fromDate), DateTimeUtils.convertDateToLocalDate(toDate), 
+									analystShiftSchedule.getFromDate(), analystShiftSchedule.getToDate()
+									);
+							if (isOverlap) {
+								hasOverlap = isOverlap;
+								break;
+							}
+						}
+						
+						if (!hasOverlap) {
+							int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, fromDate, toDate, restDays);
+							if (affectedRows > 0) {
+								totalAddedRecords++;
+							}
+						}
+					}
+				}
+				
+				totalRecords++;
+			}
+			
+			HttpSession session = request.getSession(false);
+			session.setAttribute("last_page", "SHIFT_SCHEDULE");
+			if (totalRecords == 0) {
+				session.setAttribute("error_message", "There were no records on the file.");
+			} else {
+				if (totalAddedRecords == 0) {
+					session.setAttribute("error_message", "0 records added. Please check your upload file.");
+				} else {
+					session.setAttribute("message", "Successfully uploaded " + totalAddedRecords + " out of " + totalRecords + ".");
+				}
+			}
+			
+			response.sendRedirect(request.getContextPath() + "/manage");
+		} catch (Exception exception) {
+			handleException(request, response, exception, true);
 		}
 	}
 

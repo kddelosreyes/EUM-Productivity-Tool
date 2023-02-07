@@ -171,7 +171,7 @@
 								</div>
 								<div class="form-check form-switch">
 									<input type="checkbox" class="form-check-input" id="shift_schedule_night_shift"
-										name="shift_schedule_night_shift" value="1" placeholder="Is Night Shift?">
+										name="shift_schedule_night_shift" value="1" placeholder="Is Night Shift?" onclick="return false;">
 									<label class="form-check-label" for="shift_schedule_night_shift">Is Night Shift?</label>
 								</div>
 								<br>
@@ -263,6 +263,36 @@
 								</div>
 								<div class="form-floating mb-3">
 									<button type="submit" class="btn btn-primary" id="save_analyst_shift_schedule" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
+									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="upload_analyst_shift_schedule" tabindex="-1" role="dialog" aria-labelledby="upload_analyst_shift_schedule" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalCenterTitle">Upload Analyst - Shift Schedule Mapping</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-12">
+							<form action="<%=request.getContextPath()%>/manage" method="post" enctype="multipart/form-data" autocomplete="off">
+								<input type="hidden" name="command" value="UPLOAD_ANALYST_SHIFT_SCHEDULE" />
+								<div class="input-group">
+									<input type="file" class="form-control" name="file_input" id="file_input" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+									<button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Upload</button>
+								</div>
+								<br>
+								<div class="form-floating mb-3">
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>
 								</div>
 							</form>
