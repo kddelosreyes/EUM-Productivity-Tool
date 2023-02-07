@@ -62,7 +62,8 @@ public class ActivityService extends Service {
 			    + "JOIN analyst an "
 			    + "		ON an.id = ant.analyst_id "
 				+ "WHERE an.id = ?1 "
-				+ "		AND ANT.isactive = 1");
+				+ "		AND ANT.isactive = 1 "
+				+ "ORDER BY a.activity_type_id, id");
 		query.params(analystId);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());

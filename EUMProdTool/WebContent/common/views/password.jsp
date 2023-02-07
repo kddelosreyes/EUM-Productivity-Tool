@@ -49,7 +49,7 @@
 						<div class="form-floating mb-3">
 							<input type="text" class="form-control" name="confirm_captcha"
 								id="confirm_captcha" placeholder="Confirm Code" required>
-							<label for="confirmpassword">Confirm Code</label>
+							<label for="confirm_captcha">Confirm Code</label>
 						</div>
 						<br>
 						<div class="form-floating">
@@ -195,7 +195,7 @@
 				}
 			});
 			
-			$('#confirm_code').keypress(function(e) {
+			$('#confirm_captcha').keypress(function(e) {
 				if (e.keyCode == 13) {
 					$('#confirm').click();
 				}
@@ -226,7 +226,12 @@
 								$("#username").val('');
 								$("#password").val('');
 								$("#confirm_password").val('');
-								$("#confirm_code").val('');
+								$("#confirm_captcha").val('');
+								
+								$("#password").removeClass("is-invalid");
+								$("#password").removeClass("is-valid");
+								$("#confirm_password").removeClass("is-invalid");
+								$("#confirm_password").removeClass("is-valid");
 								createCaptcha();
 							} else {
 								$("#feedback").css("visibility", "visible");
