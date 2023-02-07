@@ -3,6 +3,7 @@ package com.project.eum.prodtool.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,14 +13,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.model.Activity;
 import com.project.eum.prodtool.model.Analyst;
 import com.project.eum.prodtool.model.AnalystActivity;
+import com.project.eum.prodtool.model.AnalystActivityFieldDetail;
 import com.project.eum.prodtool.model.Attendance;
 import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.add.TimeSummary;
+import com.project.eum.prodtool.model.field.AnalystActivityField;
 import com.project.eum.prodtool.model.field.AnalystField;
 import com.project.eum.prodtool.service.ActivityService;
+import com.project.eum.prodtool.service.AnalystActivityFieldDetailService;
 import com.project.eum.prodtool.service.AnalystActivityService;
 import com.project.eum.prodtool.service.AttendanceService;
 import com.project.eum.prodtool.service.ShiftScheduleService;
@@ -39,6 +44,7 @@ public class HomeServlet extends HttpServlet {
 	private final AnalystActivityService analystActivityService = new AnalystActivityService();
 	private final AttendanceService attendanceService = new AttendanceService();
 	private final ShiftScheduleService shiftScheduleService = new ShiftScheduleService();
+	private final AnalystActivityFieldDetailService analystActivityFieldDetailService = new AnalystActivityFieldDetailService();
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -87,6 +93,9 @@ public class HomeServlet extends HttpServlet {
 			case "TIME_OUT":
 				timeOut(request, response);
 				break;
+			case "UPDATE_ATTENDANCE_STATUS":
+				updateAttendanceStatus(request, response);
+				break;
 			default:
 				defaultAction(request, response);
 			}
@@ -124,9 +133,27 @@ public class HomeServlet extends HttpServlet {
 					
 					Integer analystId = (Integer) analyst.get(AnalystField.ID);
 					List<AnalystActivity> analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
+					List<Integer> ids = analystActivities.stream()
+							.map(a -> a.getId())
+							.collect(Collectors.toList());
+					String inIds = ids.stream()
+							.map(a -> Integer.toString(a))
+							.collect(Collectors.joining(","));
+					
+					List<Entity> fieldDetails = analystActivityFieldDetailService.getRemarksFromAnalystActivityIds(inIds);
+					
 					Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
 					
-					System.out.println(analystActivities);
+					for (AnalystActivity analystActivity : analystActivities) {
+						AnalystActivityFieldDetail fieldDetail = (AnalystActivityFieldDetail) fieldDetails.stream()
+								.filter(a -> ((AnalystActivityFieldDetail)a).getAnalystActivityId() == analystActivity.getId())
+								.findAny()
+								.orElse(null);
+						
+						if (fieldDetail != null) {
+							analystActivity.set(AnalystActivityField.remarks, fieldDetail.getValue());
+						}
+					}
 					
 					long totalWorkingMinutes = analystActivities.stream()
 							.mapToLong(a -> a.getMinutes()).sum();
@@ -225,6 +252,24 @@ public class HomeServlet extends HttpServlet {
 			} else {
 				System.out.println("Affected Rows: " + affectedRows);
 				response.sendRedirect(request.getContextPath() + "/home");
+			}
+		} catch (SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	protected void updateAttendanceStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer attendanceId = Integer.parseInt(request.getParameter("attendance_id"));
+		String status = request.getParameter("status");
+		
+		try {
+			int affectedRows = attendanceService.updateAttendanceStatus(attendanceId, status);
+			
+			if (affectedRows == 0) {
+				throw new SQLException("Affected rows = 0");
+			} else {
+				System.out.println("Affected Rows: " + affectedRows);
+				response.getWriter().write("SUCCESS");
 			}
 		} catch (SQLException exc) {
 			exc.printStackTrace();

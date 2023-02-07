@@ -9,6 +9,7 @@ public enum AttendanceColumn implements Column {
 	TIME_IN,
 	TIME_OUT,
 	REMARKS,
+	STATUS,
 	CREATED_DATE,
 	UPDATED_DATE;
 	

@@ -11,6 +11,7 @@ public enum AttendanceField implements EntityField {
 	timeIn(LocalDateTime.class),
 	timeOut(LocalDateTime.class),
 	remarks(String.class),
+	status(String.class),
 	createdDate(LocalDateTime.class),
 	updatedDate(LocalDateTime.class);
 	

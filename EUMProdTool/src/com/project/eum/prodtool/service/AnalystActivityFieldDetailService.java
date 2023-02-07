@@ -3,6 +3,8 @@ package com.project.eum.prodtool.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.base.Service;
@@ -59,6 +61,23 @@ public class AnalystActivityFieldDetailService extends Service {
 		
 		int affectedRows = executeUpdate(query.getQuery());
 		return affectedRows;
+	}
+	
+	public List<Entity> getRemarksFromAnalystActivityIds(String ids) throws SQLException {
+		List<Entity> entities = new ArrayList<>();
+		
+		String sql = "SELECT * "
+				+ "FROM analyst_activity_field_detail "
+				+ "WHERE analyst_activity_id IN (" + ids +") "
+				+ "		AND field_id = 5";
+		Query query = new Query(sql);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		while (resultSet.next()) {
+			entities.add(getResultSetEntity(resultSet));
+		}
+		
+		return entities;
 	}
 	
 }

@@ -117,7 +117,7 @@
 				return false;
 			} else if (validateCaptcha > 0 || recaptcha.length > 9) {
 				$("#feedback").css("visibility", "visible");
-				$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> Wrong captcha.");
+				$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> Confirmation code is wrong.");
 				return false;
 			} else {
 				return true;

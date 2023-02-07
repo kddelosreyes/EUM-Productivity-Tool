@@ -10,6 +10,7 @@ public class Attendance extends Entity {
 	private LocalDateTime timeIn;
 	private LocalDateTime timeOut;
 	private String remarks;
+	private String status;
 	private LocalDateTime createdDate;
 	private LocalDateTime updatedDate;
 	
@@ -36,6 +37,10 @@ public class Attendance extends Entity {
 	
 	public String getRemarks() {
 		return remarks;
+	}
+	
+	public String getStatus() {
+		return status;
 	}
 
 	public LocalDateTime getCreatedDate() {

@@ -312,14 +312,14 @@
 								</div>
 								<small class="text-muted">Required</small>
 								<br>
-								<div class="input-group">
+								<div class="btn-group">
 									<input type="radio" class="btn-check btn-outline-secondary" name="is_required" id="is_required_yes" value="1" autocomplete="off" checked>
 									<label class="btn btn-outline-secondary" for="is_required_yes">Yes</label>
 									
 									<input type="radio" class="btn-check" name="is_required" id="is_required_no" value="0" autocomplete="off">
 									<label class="btn btn-outline-secondary" for="is_required_no">No</label>
 								</div>
-								<br>
+								<br><br>
 								<div class="form-floating mb-3">
 									<button type="submit" class="btn btn-primary" id="save_field" value="SAVE"><i class="bi bi-check-lg"></i> Save</button>
 									<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Close</button>

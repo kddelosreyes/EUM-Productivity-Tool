@@ -31,6 +31,7 @@ public class AttendanceService extends Service {
 		LocalDateTime timeIn = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AttendanceColumn.TIME_IN.getColumnName()));
 		LocalDateTime timeOut = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AttendanceColumn.TIME_OUT.getColumnName()));
 		String remarks = resultSet.getString(AttendanceColumn.REMARKS.getColumnName());
+		String status = resultSet.getString(AttendanceColumn.STATUS.getColumnName());
 		LocalDateTime createdDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AttendanceColumn.CREATED_DATE.getColumnName()));
 		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AttendanceColumn.UPDATED_DATE.getColumnName()));
 		
@@ -40,6 +41,7 @@ public class AttendanceService extends Service {
 				.set(AttendanceField.timeIn, timeIn)
 				.set(AttendanceField.timeOut, timeOut)
 				.set(AttendanceField.remarks, remarks)
+				.set(AttendanceField.status, status)
 				.set(AttendanceField.createdDate, createdDate)
 				.set(AttendanceField.updatedDate, updatedDate);
 		
@@ -86,6 +88,16 @@ public class AttendanceService extends Service {
 				+ "SET time_out = current_timestamp() "
 				+ "WHERE id = ?1");
 		query.params(attendanceId);
+		
+		int affectedRows = executeUpdate(query.getQuery());
+		return affectedRows;
+	}
+	
+	public Integer updateAttendanceStatus(Integer attendanceId, String status) throws SQLException {
+		Query query = new Query("UPDATE attendance "
+				+ "SET status = ?1 "
+				+ "WHERE id = ?2");
+		query.params(status, attendanceId);
 		
 		int affectedRows = executeUpdate(query.getQuery());
 		return affectedRows;
@@ -195,5 +207,14 @@ public class AttendanceService extends Service {
 		}
 		
 		return attendanceLogs;
+	}
+	
+	public Integer updateAttendanceStatusById(String status, Integer id) throws SQLException {
+		String sql = "UPDATE attendance SET status = ?1 WHERE id = ?2";
+		Query query = new Query(sql);
+		query.params(status, id);
+		
+		Integer affectedRows = executeUpdate(query.getQuery());
+		return affectedRows;
 	}
 }

@@ -25,7 +25,6 @@ public class AnalystActivity extends Entity {
 	private Long minutes;
 	private String timeMinutes;
 	
-	
 	public AnalystActivity() {
 		super();
 	}

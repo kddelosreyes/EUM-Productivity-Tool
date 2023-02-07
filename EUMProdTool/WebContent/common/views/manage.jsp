@@ -30,73 +30,73 @@
 <body onload=displayClock(); class="d-flex flex-column h-100 bg-purple">
 	<header>
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-		<div class="container-fluid">
-			<a class="navbar-brand" href="<%=request.getContextPath()%>/manage">EUM Productivity Tool</a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-				data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
-				aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarCollapse">
-				<ul class="nav nav-pills me-auto mb-2 mb-md-0">
-					<li class="nav-item" role="presentation">
-						<button class="nav-link active" id="pills-home"
-							data-bs-toggle="pill" data-bs-target="#pills-home-div"
-							type="button" role="tab" aria-controls="pills-home-div"
-							aria-selected="false"><i class="bi bi-house"></i> Home</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button class="nav-link" id="pills-entities-activities"
-							data-bs-toggle="pill" data-bs-target="#pills-entities-activities-div"
-							type="button" role="tab" aria-controls="pills-entities-activities-div"
-							aria-selected="false"><i class="bi bi-activity"></i> Activities</button>
-					</li>
-					<li>
-						<button class="nav-link" id="pills-entities-analysts"
-							data-bs-toggle="pill" data-bs-target="#pills-entities-analysts-div"
-							type="button" role="tab" aria-controls="pills-entities-analysts-div"
-							aria-selected="false"><i class="bi bi-person"></i> Analysts</button>
-					</li>
-					<li>
-						<button class="nav-link" id="pills-entities-teams"
-							data-bs-toggle="pill" data-bs-target="#pills-entities-teams-div"
-							type="button" role="tab" aria-controls="pills-entities-teams-div"
-							aria-selected="false"><i class="bi bi-people"></i> Teams</button>
-					</li>
-					<li>
-						<button class="nav-link" id="pills-attendance-attendance"
-							data-bs-toggle="pill" data-bs-target="#pills-attendance-attendance-div"
-							type="button" role="tab" aria-controls="pills-attendance-attendance-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar"></i> Attendance</button>
-					</li>
-					<li>
-						<button class="nav-link" id="pills-attendance-shift-schedule"
-							data-bs-toggle="pill" data-bs-target="#pills-attendance-shift-schedule-div"
-							type="button" role="tab" aria-controls="pills-attendance-shift-schedule-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-week"></i> Shift Schedule</button>
-					</li>
-					<li>
-						<button class="nav-link" id="pills-attendance-leaves"
-							data-bs-toggle="pill" data-bs-target="#pills-attendance-leaves-div"
-							type="button" role="tab" aria-controls="pills-attendance-leaves-div"
-							aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-x"></i> Leaves</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button class="nav-link" id="pills-reports"
-							data-bs-toggle="pill" data-bs-target="#pills-reports-div"
-							type="button" role="tab" aria-controls="pills-reports-div"
-							aria-selected="false"><i class="bi bi-file-earmark-spreadsheet"></i> Reports</button>
-					</li>
-				</ul>
-				<c:url var="logout" value="login">
-					<c:param name="command" value="LOGOUT" />
-				</c:url>
-				<div class="btn-group d-flex">
-					<a href="${logout}" class="btn btn-primary" role="button" aria-pressed="true"><i class="bi bi-box-arrow-left"></i> Logout</a>
+			<div class="container-fluid">
+				<a class="navbar-brand" href="<%=request.getContextPath()%>/manage">EUM Productivity Tool</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+					data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
+					aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarCollapse">
+					<ul class="nav nav-pills me-auto mb-2 mb-md-0">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link active" id="pills-home"
+								data-bs-toggle="pill" data-bs-target="#pills-home-div"
+								type="button" role="tab" aria-controls="pills-home-div"
+								aria-selected="false"><i class="bi bi-house"></i> Home</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="pills-entities-activities"
+								data-bs-toggle="pill" data-bs-target="#pills-entities-activities-div"
+								type="button" role="tab" aria-controls="pills-entities-activities-div"
+								aria-selected="false"><i class="bi bi-activity"></i> Activities</button>
+						</li>
+						<li>
+							<button class="nav-link" id="pills-entities-analysts"
+								data-bs-toggle="pill" data-bs-target="#pills-entities-analysts-div"
+								type="button" role="tab" aria-controls="pills-entities-analysts-div"
+								aria-selected="false"><i class="bi bi-person"></i> Analysts</button>
+						</li>
+						<li>
+							<button class="nav-link" id="pills-entities-teams"
+								data-bs-toggle="pill" data-bs-target="#pills-entities-teams-div"
+								type="button" role="tab" aria-controls="pills-entities-teams-div"
+								aria-selected="false"><i class="bi bi-people"></i> Teams</button>
+						</li>
+						<li>
+							<button class="nav-link" id="pills-attendance-attendance"
+								data-bs-toggle="pill" data-bs-target="#pills-attendance-attendance-div"
+								type="button" role="tab" aria-controls="pills-attendance-attendance-div"
+								aria-selected="false" aria-expanded="true"><i class="bi bi-calendar"></i> Attendance</button>
+						</li>
+						<li>
+							<button class="nav-link" id="pills-attendance-shift-schedule"
+								data-bs-toggle="pill" data-bs-target="#pills-attendance-shift-schedule-div"
+								type="button" role="tab" aria-controls="pills-attendance-shift-schedule-div"
+								aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-week"></i> Shift Schedule</button>
+						</li>
+						<li>
+							<button class="nav-link" id="pills-attendance-leaves"
+								data-bs-toggle="pill" data-bs-target="#pills-attendance-leaves-div"
+								type="button" role="tab" aria-controls="pills-attendance-leaves-div"
+								aria-selected="false" aria-expanded="true"><i class="bi bi-calendar-x"></i> Leaves</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="pills-reports"
+								data-bs-toggle="pill" data-bs-target="#pills-reports-div"
+								type="button" role="tab" aria-controls="pills-reports-div"
+								aria-selected="false"><i class="bi bi-file-earmark-spreadsheet"></i> Reports</button>
+						</li>
+					</ul>
+					<c:url var="logout" value="login">
+						<c:param name="command" value="LOGOUT" />
+					</c:url>
+					<div class="btn-group d-flex">
+						<a href="${logout}" class="btn btn-primary" role="button" aria-pressed="true"><i class="bi bi-box-arrow-left"></i> Logout</a>
+					</div>
 				</div>
 			</div>
-		</div>
-	</nav>
+		</nav>
 	</header>
 	
 	<main class="flex-shrink-0">

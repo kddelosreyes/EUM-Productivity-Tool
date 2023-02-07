@@ -28,13 +28,16 @@
 				<c:url var="logout" value="login">
 					<c:param name="command" value="LOGOUT" />
 				</c:url>
+				<c:url var="change_password" value="changepassword">
+					<c:param name="command" value="DEFAULT_FROM_ANALYST" />
+				</c:url>
 				<div class="btn-group d-flex">
 					<button class="btn btn-primary dropdown-toggle" type="button"
 						id="account_drop_down" data-bs-toggle="dropdown"
 						data-bs-display="static" aria-expanded="false">Welcome, ${analyst.firstName}!</button>
 					<ul class="dropdown-menu dropdown-menu-lg-end"">
 						<li>
-							<a href="#" class="dropdown-item">
+							<a href="${change_password}" class="dropdown-item">
 								<i class="bi bi-person"></i> My Profile
 							</a>
 						</li>

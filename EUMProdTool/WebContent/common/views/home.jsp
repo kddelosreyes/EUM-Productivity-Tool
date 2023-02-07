@@ -37,40 +37,58 @@
 	<main class="flex-shrink-0">
 		<br>
 		<div class="container">
-			<div class="row">
+			<div class="row">				
 				<div class="col"></div>
 				<div class="col-9">
 					<div class="card">
 						<h5 class="card-header"><b>Activities</b></h5>
-						<div class="card-body d-flex">
+						<div class="card-body d-flex justify-content-between">
 							<form action="<%=request.getContextPath()%>/home" method="post">
-							<input type="hidden" name="analyst_id" value="${analyst.id}" />
-							<div class="input-group">
-								<select	class="form-select" name="activity_id" style="width: fit-content; display: inline">
-									<c:forEach items="${activities}" var="activity">
-										<option value="${activity.id}">${activity.name}</option>
-									</c:forEach>
-								</select>
-								<c:choose>
-									<c:when test="${is_any_pending or not empty attendance.timeOut}">
-										<button type="submit" class="btn btn-outline-primary" disabled name="command" value="START_ACTIVITY">
-											<i class="bi bi-play"></i> Start Activity
+								<input type="hidden" name="analyst_id" value="${analyst.id}" />
+								<div class="input-group">
+									<select	class="form-select" name="activity_id" style="width: fit-content; display: inline">
+										<c:forEach items="${activities}" var="activity">
+											<option value="${activity.id}">${activity.name}</option>
+										</c:forEach>
+									</select>
+									<c:choose>
+										<c:when test="${is_any_pending or not empty attendance.timeOut}">
+											<button type="submit" class="btn btn-outline-primary" disabled name="command" value="START_ACTIVITY">
+												<i class="bi bi-play"></i> Start
+											</button>
+										</c:when>
+										<c:otherwise>
+											<button type="submit" class="btn btn-outline-primary" name="command" value="START_ACTIVITY">
+												<i class="bi bi-play"></i> Start
+											</button>
+										</c:otherwise>
+									</c:choose>
+									<c:if test="${(empty attendance.timeOut) and not (has_pending)}">
+										<input type="hidden" name="attendance_id" value="${attendance.id}" />
+										<button type="submit" class="btn btn-outline-danger" name="command" value="TIME_OUT">
+											<i class="bi bi-hourglass-bottom"></i> Clock Out
 										</button>
-									</c:when>
-									<c:otherwise>
-										<button type="submit" class="btn btn-outline-primary" name="command" value="START_ACTIVITY">
-											<i class="bi bi-play"></i> Start Activity
-										</button>
-									</c:otherwise>
-								</c:choose>
-								<c:if test="${(empty attendance.timeOut) and not (has_pending)}">
-									<input type="hidden" name="attendance_id" value="${attendance.id}" />
-									<button type="submit" class="btn btn-outline-danger" name="command" value="TIME_OUT">
-										<i class="bi bi-hourglass-bottom"></i> Clock Out
-									</button>
-								</c:if>
+									</c:if>
+								</div>
+							</form>
+							<div class="text-end">
+								<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+									<c:if test="${attendance.status == 'ONSITE' }">
+										<input type="radio" class="btn-check btn-outline-primary" name="status" id="onsite" value="ONSITE" autocomplete="off" checked>
+										<label class="btn btn-outline-primary" for="onsite">Onsite</label>
+										
+										<input type="radio" class="btn-check btn-outline-primary" name="status" id="wfh" value="WFH" autocomplete="off">
+										<label class="btn btn-outline-primary" for="wfh">WFH</label>
+									</c:if>
+									<c:if test="${attendance.status == 'WFH' }">
+										<input type="radio" class="btn-check btn-outline-primary" name="status" id="onsite" value="ONSITE" autocomplete="off">
+										<label class="btn btn-outline-primary" for="onsite">Onsite</label>
+										
+										<input type="radio" class="btn-check btn-outline-primary" name="status" id="wfh" value="WFH" autocomplete="off" checked>
+										<label class="btn btn-outline-primary" for="wfh">WFH</label>
+									</c:if>
+								</div>
 							</div>
-						</form>
 						</div>
 					</div>
 					<!--<div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">-->
@@ -122,7 +140,7 @@
 											<td>${analystActivity.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))}</td>
 											<td>${analystActivity.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))}</td>
 											<td>${analystActivity.timeMinutes}</td>
-											<td>Remarks</td>
+											<td>${analystActivity.remarks}</td>
 											<td>
 												<div class="input-group">
 													<c:if test="${analystActivity.activity.activityTypeId == 1}">
@@ -263,6 +281,27 @@
 	        "fnStateLoad": function (oSettings) {
 	            return JSON.parse(localStorage.getItem('table_analyst_activity_table'));
 	        }
+	    });
+	    
+	    $('input[type=radio][name=status]').change(function() {
+	    	<c:set var="attendanceId" value="${attendance.id}"/> 
+	    	var attendanceId = '<c:out value="${attendanceId}"/>';
+	    	
+	    	$.ajax({
+				type : "POST",
+				url : "home",
+				data : {
+					command : "UPDATE_ATTENDANCE_STATUS",
+					status : this.value,
+					attendance_id : attendanceId
+				},
+				success : function(responseText) {
+					console.log("Response Text: " + responseText);
+					if (responseText === 'SUCCESS') {
+						window.location.href = "http://localhost:8080/EUMProdTool/home";
+					}
+			    }
+			});
 	    });
 	});
 	</script>

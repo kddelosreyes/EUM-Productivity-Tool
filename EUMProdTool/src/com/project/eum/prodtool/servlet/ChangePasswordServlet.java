@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.project.eum.prodtool.model.Analyst;
 import com.project.eum.prodtool.model.AnalystLogin;
 import com.project.eum.prodtool.model.column.AnalystLoginColumn;
 import com.project.eum.prodtool.service.AnalystLoginService;
@@ -50,6 +51,9 @@ public class ChangePasswordServlet extends HttpServlet {
 		case "CHANGE_PASSWORD":
 			changePassword(request, response);
 			break;
+		case "DEFAULT_FROM_ANALYST":
+			defaultFromAnalyst(request, response);
+			break;
 		default:
 			defaultAction(request, response);
 		}
@@ -74,6 +78,26 @@ public class ChangePasswordServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath() + "/");
 		} else {
 			request.getRequestDispatcher("common/views/password.jsp").forward(request, response);
+		}
+	}
+	
+	protected void defaultFromAnalyst(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		
+		if (session == null) {
+			response.setHeader("Pragma", "no-cache");
+			response.setHeader("Cache-Control", "no-store");
+			response.setHeader("Expires", "0");
+			response.setDateHeader("Expires", -1);
+			response.sendRedirect(request.getContextPath() + "/");
+		} else {
+			Analyst analyst = (Analyst) session.getAttribute("analyst");
+			AnalystLogin analystLogin = (AnalystLogin) session.getAttribute("analyst_login");
+			
+			request.setAttribute("analyst", analyst);
+			request.setAttribute("analyst_login", analystLogin);
+			
+			request.getRequestDispatcher("common/views/changepassword.jsp").forward(request, response);
 		}
 	}
 	
