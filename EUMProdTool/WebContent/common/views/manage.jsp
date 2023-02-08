@@ -203,6 +203,7 @@
 				String lastPage = (String) session.getAttribute("last_page");
 				String message = (session.getAttribute("message") == null ? "" : (String) session.getAttribute("message"));
 				String errorMessage = (session.getAttribute("error_message") == null ? "" : (String) session.getAttribute("error_message"));
+				String server = (String) session.getAttribute("server");
 			%>
 			
 			var jsLastPage = '<%= lastPage %>';
@@ -285,10 +286,11 @@
 							email : emailField.val()
 						},
 						success : function(responseText) {
+							var server = '<%= server %>';
 							if (responseText) {
-								window.location.href = "http://localhost:8080/EUMProdTool/manage";
+								window.location.href = "http://" + server + ":8080/EUMProdTool/manage";
 							} else {
-								window.location.href = "http://localhost:8080/EUMProdTool/error";
+								window.location.href = "http://" + server + ":8080/EUMProdTool/error";
 							}
 				        }
 					});
@@ -526,10 +528,11 @@
 						report_end_date		: $("#report_end_date").val()
 					},
 					success : function(responseText) {
+						var server = '<%= server %>';
 						if (responseText) {
-							window.location.href = "http://localhost:8080/EUMProdTool/manage";
+							window.location.href = "http://" + server + ":8080/EUMProdTool/manage";
 						} else {
-							window.location.href = "http://localhost:8080/EUMProdTool/error";
+							window.location.href = "http://" + server + ":8080/EUMProdTool/error";
 						}
 			        }
 				});

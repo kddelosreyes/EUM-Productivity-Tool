@@ -52,7 +52,7 @@
 										</c:forEach>
 									</select>
 									<c:choose>
-										<c:when test="${is_any_pending or not empty attendance.timeOut}">
+										<c:when test="${not empty attendance.timeOut}">
 											<button type="submit" class="btn btn-outline-primary" disabled name="command" value="START_ACTIVITY">
 												<i class="bi bi-play"></i> Start
 											</button>
@@ -301,7 +301,12 @@
 				success : function(responseText) {
 					console.log("Response Text: " + responseText);
 					if (responseText === 'SUCCESS') {
-						window.location.href = "http://localhost:8080/EUMProdTool/home";
+						<%
+							String server = (String) session.getAttribute("server");
+						%>
+						
+						var server = '<%= server %>';
+						window.location.href = "http://" + server + ":8080/EUMProdTool/home";
 					}
 			    }
 			});

@@ -201,7 +201,9 @@
 								<div id="feedback" class="alert alert-danger" role="alert" style="visibility:hidden">
 								</div>
 								<div id="link" class="alert alert-success" role="alert" style="visibility:hidden">
-									<i class="bi bi-check-lg"></i> Success! <a href="http://localhost:8080/EUMProdTool/home">You have successfully changed your password.</a>
+									<c:url var="home" value="home">
+									</c:url>
+									<i class="bi bi-check-lg"></i> Success! <a href="${home}">You have successfully changed your password.</a>
 								</div>
 							</form>
 						</div>
@@ -267,6 +269,9 @@
 		}
 
 		$(document).ready(function() {
+			<%
+				String server = (String) session.getAttribute("server");
+			%>
 			var form = $('#login_form');
 			console.log($("#username").val());
 
@@ -344,7 +349,8 @@
 			});
 			
 			$('#back').click(function() {
-				window.location.href = "http://localhost:8080/EUMProdTool/home";
+				var server = '<%= server %>';
+				window.location.href = "http://" + server + ":8080/EUMProdTool/home";
 			});
 
 			$("#confirm").click(function() {

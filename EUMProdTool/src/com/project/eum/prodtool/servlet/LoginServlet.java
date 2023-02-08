@@ -1,5 +1,7 @@
 package com.project.eum.prodtool.servlet;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -56,7 +58,7 @@ public class LoginServlet extends AppServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-
+		
 		String command = request.getParameter("command");
 
 		if (command == null) {
@@ -68,8 +70,8 @@ public class LoginServlet extends AppServlet {
 			defaultAction(request, response);
 			break;
 		case "LOGIN":
-			HttpSession session = request.getSession(false);
-			if (session != null && session.getAttribute("analyst") != null) {
+			HttpSession session1 = request.getSession(false);
+			if (session1 != null && session1.getAttribute("analyst") != null) {
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/home");
 				dispatcher.forward(request, response);
 			} else {
@@ -97,6 +99,14 @@ public class LoginServlet extends AppServlet {
 		if (session == null) {
 		    session = request.getSession();
 		}
+		
+		String filePath = getServletContext().getRealPath("/WEB-INF/files/server.init");
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String server = br.readLine();
+			System.out.println(server);
+			session.setAttribute("server", server);
+		}
+		
 		request.getRequestDispatcher("common/views/login.jsp").forward(request, response);
 	}
 	

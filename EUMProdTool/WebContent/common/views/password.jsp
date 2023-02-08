@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ page errorPage="error.jsp" %>  
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -63,7 +65,9 @@
 						<div id="feedback" class="alert alert-danger" role="alert" style="visibility:hidden">
 						</div>
 						<div id="link" class="alert alert-success" role="alert" style="visibility:hidden">
-							<i class="bi bi-check-lg"></i> Success! <a href="http://localhost:8080/EUMProdTool/">Please click here to login.</a>
+						<c:url var="login" value="login">
+						</c:url>
+							<i class="bi bi-check-lg"></i> Success! <a href="${login}">Please click here to login.</a>
 						</div>
 					</form>
 				</div>
@@ -125,6 +129,9 @@
 		}
 
 		$(document).ready(function() {
+			<%
+				String server = (String) session.getAttribute("server");
+			%>
 			var form = $('#login_form');
 			console.log($("#username").val());
 

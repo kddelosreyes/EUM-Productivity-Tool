@@ -64,6 +64,10 @@
 
 	<script type="text/javascript">
 	$(document).ready(function() {
+		<%
+			String server = (String) session.getAttribute("server");
+		%>
+		
 		var form = $('#login_form');
 		console.log($("#username").val());
 		
@@ -93,13 +97,15 @@
 				success : function(responseText) {
 					$("#feedback").css("visibility", "hidden");
 					console.log("Response Text: " + responseText);
+					
+					var server = '<%= server %>';
 					if (responseText === 'MANAGER-LOGIN') {
-						window.location.href = "http://localhost:8080/EUMProdTool/manage";
+						window.location.href = "http://" + server + ":8080/EUMProdTool/manage";
 					} else if (responseText === 'ANALYST-LOGIN') {
-						window.location.href = "http://localhost:8080/EUMProdTool/home";
+						window.location.href = "http://" + server + ":8080/EUMProdTool/home";
 					} else if (responseText === 'CHANGE-PASSWORD') {
 						setFieldsDefault();
-						window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
+						window.location.href = "http://" + server + ":8080/EUMProdTool/changepassword";
 					} else {
 						<%
 							String errorMessage = (String) session.getAttribute("error_message");
@@ -112,15 +118,16 @@
 							$("#feedback").html("<i class='bi bi-exclamation-triangle'></i> " + responseText);
 						} else {
 							setFieldsDefault();
-							window.location.href = "http://localhost:8080/EUMProdTool/error";
+							window.location.href = "http://" + server + ":8080/EUMProdTool/error";
 						}
 					}
 		        }
 			});
 		});
 		
-		$("#forgot_password").click(function() {
-			window.location.href = "http://localhost:8080/EUMProdTool/changepassword";
+		$("#forgot_password").click(function() {			
+			var server = '<%= server %>';
+			window.location.href = "http://" + server + ":8080/EUMProdTool/changepassword";
 		});
 		
 		function setFieldsDefault() {
