@@ -128,32 +128,58 @@ public class HomeServlet extends HttpServlet {
 				System.out.println("Analyst Id: " + analyst.getId());
 				
 				try {
+					Integer analystId = (Integer) analyst.get(AnalystField.ID);
+					
+					ShiftSchedule shiftSchedule = (ShiftSchedule) shiftScheduleService.getShiftScheduleByAnalystId(analystId);
+					Attendance attendance = null;
+					if (shiftSchedule.getIsNightShift()) {
+						if (attendanceService.hasAttendanceForYesterdayNoOut(analystId)) {
+							attendance = (Attendance) attendanceService.getAttendanceForYesterday(analystId);
+						} else if (attendanceService.hasAttendanceForYesterday(analystId)) {
+							attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);							
+						}
+					} else {
+						attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);
+					}
+					
+					if (attendance == null) {
+						attendance = (Attendance) attendanceService.getLatestAttendance(analystId);
+					}
+					
 					List<Activity> activities = activityService.getActivitiesByAnalystId((Integer) analyst.get(AnalystField.ID));
 					request.setAttribute("activities", activities);
 					
-					Integer analystId = (Integer) analyst.get(AnalystField.ID);
-					List<AnalystActivity> analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
-					List<Integer> ids = analystActivities.stream()
-							.map(a -> a.getId())
-							.collect(Collectors.toList());
-					String inIds = ids.stream()
-							.map(a -> Integer.toString(a))
-							.collect(Collectors.joining(","));
+					List<AnalystActivity> analystActivities = null;
 					
-					List<Entity> fieldDetails = analystActivityFieldDetailService.getRemarksFromAnalystActivityIds(inIds);
+					if (shiftSchedule.getIsNightShift()) {
+						analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId, attendance.getTimeIn(), attendance.getTimeOut());
+					} else {
+						analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
+					}
 					
-					Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
-					
-					for (AnalystActivity analystActivity : analystActivities) {
-						AnalystActivityFieldDetail fieldDetail = (AnalystActivityFieldDetail) fieldDetails.stream()
-								.filter(a -> ((AnalystActivityFieldDetail)a).getAnalystActivityId() == analystActivity.getId())
-								.findAny()
-								.orElse(null);
+					if (!analystActivities.isEmpty()) {
+						List<Integer> ids = analystActivities.stream()
+								.map(a -> a.getId())
+								.collect(Collectors.toList());
+						String inIds = ids.stream()
+								.map(a -> Integer.toString(a))
+								.collect(Collectors.joining(","));
 						
-						if (fieldDetail != null) {
-							analystActivity.set(AnalystActivityField.remarks, fieldDetail.getValue());
+						List<Entity> fieldDetails = analystActivityFieldDetailService.getRemarksFromAnalystActivityIds(inIds);
+						
+						for (AnalystActivity analystActivity : analystActivities) {
+							AnalystActivityFieldDetail fieldDetail = (AnalystActivityFieldDetail) fieldDetails.stream()
+									.filter(a -> ((AnalystActivityFieldDetail)a).getAnalystActivityId() == analystActivity.getId())
+									.findAny()
+									.orElse(null);
+							
+							if (fieldDetail != null) {
+								analystActivity.set(AnalystActivityField.remarks, fieldDetail.getValue());
+							}
 						}
 					}
+					
+					Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
 					
 					long totalWorkingMinutes = analystActivities.stream()
 							.mapToLong(a -> a.getMinutes()).sum();
@@ -167,7 +193,7 @@ public class HomeServlet extends HttpServlet {
 							.mapToLong(a -> a.getMinutes()).sum();
 					
 					long totalNonProductiveMinutes = analystActivities.stream()
-							.filter(a -> a.getActivity().getActivityTypeId() == 2)
+							.filter(a -> a.getActivity().getActivityTypeId() == 3)
 							.mapToLong(a -> a.getMinutes()).sum();
 					
 					TimeSummary timeSummary = new TimeSummary();
@@ -176,8 +202,6 @@ public class HomeServlet extends HttpServlet {
 					timeSummary.setTotalNeutral(totalNeutralMinutes);
 					timeSummary.setTotalNonProductive(totalNonProductiveMinutes);
 					
-					Attendance attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);
-					
 					AnalystActivity analystActivity = analystActivities
 							.stream()
 							.filter(a -> a.getEndTime() == null)
@@ -185,8 +209,6 @@ public class HomeServlet extends HttpServlet {
 							.orElse(null);
 					
 					boolean hasPending = analystActivity != null;
-					
-					ShiftSchedule shiftSchedule = (ShiftSchedule) shiftScheduleService.getShiftScheduleByAnalystId(analystId);
 					
 					request.setAttribute("analyst_activities", analystActivities);
 					request.setAttribute("is_any_pending", isAnyPending);

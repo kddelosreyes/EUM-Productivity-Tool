@@ -95,6 +95,41 @@ public class AnalystActivityService extends Service {
 		return analystActivities;
 	}
 	
+	public List<AnalystActivity> getTodaysActivitiesByAnalystId(Integer analystId, LocalDateTime startTime, LocalDateTime endTime) throws SQLException {
+		List<AnalystActivity> analystActivities = new ArrayList<AnalystActivity>();
+		
+		String sql = "";
+		
+		if (endTime == null) {
+			sql = "SELECT * "
+					+ "FROM analyst_activity "
+					+ "WHERE analyst_id = ?1 "
+					+ "AND start_time > ?2 "
+					+ "ORDER BY start_time";
+		} else {
+			sql = "SELECT * "
+					+ "FROM analyst_activity "
+					+ "WHERE analyst_id = ?1 "
+					+ "AND start_time BETWEEN ?2 AND ?3 "
+					+ "ORDER BY start_time";
+		}
+		
+		Query query = new Query(sql);
+		
+		if (endTime == null) {
+			query.params(analystId, DateTimeUtils.toSqlDateTimeString(startTime));
+		} else {
+			query.params(analystId, DateTimeUtils.toSqlDateTimeString(startTime), DateTimeUtils.toSqlDateTimeString(endTime));
+		}
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		while (resultSet.next()) {
+			analystActivities.add((AnalystActivity) getResultSetEntity(resultSet));
+		}
+		
+		return analystActivities;
+	}
+	
 	public Boolean isAnyPendingActivityByAnalystId(Integer analystId) throws SQLException {
 		Date date = new Date();
 		String stringDate = formatter.format(date);

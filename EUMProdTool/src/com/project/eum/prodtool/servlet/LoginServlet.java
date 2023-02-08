@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.model.Analyst;
 import com.project.eum.prodtool.model.AnalystLogin;
+import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.column.AnalystLoginColumn;
 import com.project.eum.prodtool.model.field.AnalystLoginField;
 import com.project.eum.prodtool.service.ActivityService;
@@ -154,8 +155,16 @@ public class LoginServlet extends AppServlet {
 										Analyst analyst = (Analyst) analystService.getEntityById(analystId);
 										
 										analystLoginHistoryService.insertNewAnalystLoginHistory((Integer) analystLogin.get(AnalystLoginField.ID));
-										if (!attendanceService.hasAttendanceForToday(analystId)) {
-											attendanceService.insertNewAttendanceForAnalystId(analystId);
+										
+										ShiftSchedule shift = (ShiftSchedule) shiftSchedule;
+										if (shift.getIsNightShift()) {
+											if (attendanceService.hasAttendanceForYesterday(analystId) && !attendanceService.hasAttendanceForToday(analystId)) {
+												attendanceService.insertNewAttendanceForAnalystId(analystId);
+											}
+										} else {
+											if (!attendanceService.hasAttendanceForToday(analystId)) {
+												attendanceService.insertNewAttendanceForAnalystId(analystId);
+											}
 										}
 										
 										setSessionDetails(session, analyst, analystLogin);

@@ -10,6 +10,7 @@ import com.project.eum.prodtool.model.AnalystShiftSchedule;
 import com.project.eum.prodtool.model.Attendance;
 import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.add.ATD_AnalystDetails;
+import com.project.eum.prodtool.model.column.AnalystColumn;
 import com.project.eum.prodtool.model.field.AnalystField;
 import com.project.eum.prodtool.model.field.AnalystShiftScheduleField;
 import com.project.eum.prodtool.model.field.AttendanceField;
@@ -29,7 +30,7 @@ public class TabDetails_Attendance {
 		analystDetails = new ArrayList<>();
 		
 		try {
-			List<Entity> analysts = analystService.getAll();
+			List<Entity> analysts = analystService.getEntitiesByColumn(AnalystColumn.IS_ACTIVE, 1);
 			List<Entity> attendances = attendanceService.getAttendancesForToday();
 			List<Entity> shiftSchedules = analystShiftScheduleService.getCurrentShiftSchedules();
 			

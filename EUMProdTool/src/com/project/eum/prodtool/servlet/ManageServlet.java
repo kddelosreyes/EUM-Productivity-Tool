@@ -692,7 +692,6 @@ public class ManageServlet extends AppServlet {
 						}
 					}
 				}
-				
 				totalRecords++;
 			}
 			

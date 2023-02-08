@@ -71,7 +71,10 @@
 									</c:if>
 								</div>
 							</form>
-							<div class="text-end">
+							<c:if test="${not empty attendance.timeOut}"> 
+								<c:set value="visibility:hidden;" var="styles"></c:set>
+							</c:if> 
+							<div class="text-end" style="${styles}">
 								<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 									<c:if test="${attendance.status == 'ONSITE' }">
 										<input type="radio" class="btn-check btn-outline-primary" name="status" id="onsite" value="ONSITE" autocomplete="off" checked>
@@ -143,7 +146,7 @@
 											<td>${analystActivity.remarks}</td>
 											<td>
 												<div class="input-group">
-													<c:if test="${analystActivity.activity.activityTypeId == 1}">
+													<c:if test="${analystActivity.activity.activityTypeId != 3}">
 														<a href="${view_details}" class="btn btn-outline-success btn-sm" role="button" aria-pressed="true">View</a>
 													</c:if>
 													<c:if test="${empty analystActivity.endTime}">

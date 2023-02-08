@@ -20,6 +20,8 @@ public class DateTimeUtils {
 
 	private static final DateFormat SQL_DATE_FORMATTER = new SimpleDateFormat("YYYY-MM-dd");
 	
+	private static final DateTimeFormatter SQL_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
+	
 	public static LocalDateTime convertTimestampToLocalDateTime(Timestamp timestamp) {
 		return timestamp == null ?
 				null : 
@@ -73,6 +75,10 @@ public class DateTimeUtils {
 	
 	public static String toSqlDateString(Date date) {
 		return SQL_DATE_FORMATTER.format(date);
+	}
+	
+	public static String toSqlDateTimeString(LocalDateTime localDateTime) {
+		return SQL_DATETIME_FORMATTER.format(localDateTime);
 	}
 	
 	public static Date toDateFormat(String strDate, String format) {

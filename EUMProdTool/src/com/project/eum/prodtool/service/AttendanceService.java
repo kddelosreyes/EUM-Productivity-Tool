@@ -78,9 +78,71 @@ public class AttendanceService extends Service {
 		query.params(analystId);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());
-		resultSet.next();
+		if (resultSet.next()) {
+			return getResultSetEntity(resultSet);
+		} else {
+			return null;
+		}
+	}
+	
+	public boolean hasAttendanceForYesterdayNoOut(Integer analystId) throws SQLException {
+		Query query = new Query("SELECT * "
+				+ "FROM attendance " 
+				+ "WHERE analyst_id = ?1 " 
+				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(date_sub(CURRENT_TIMESTAMP, interval 1 day), '%Y-%m-%d') " 
+				+ "AND time_out IS NULL "
+				+ "AND remarks = 'REGULAR'");
+		query.params(analystId);
 		
-		return getResultSetEntity(resultSet);
+		ResultSet resultSet = executeQuery(query.getQuery());
+		return resultSet.next();
+	}
+	
+	public boolean hasAttendanceForYesterday(Integer analystId) throws SQLException {
+		Query query = new Query("SELECT * "
+				+ "FROM attendance " 
+				+ "WHERE analyst_id = ?1 " 
+				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(date_sub(CURRENT_TIMESTAMP, interval 1 day), '%Y-%m-%d') " 
+				+ "AND time_out IS NOT NULL "
+				+ "AND remarks = 'REGULAR'");
+		query.params(analystId);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		return resultSet.next();
+	}
+	
+	public Entity getAttendanceForYesterday(Integer analystId) throws SQLException {
+		Query query = new Query("SELECT * "
+				+ "FROM attendance " 
+				+ "WHERE analyst_id = ?1 " 
+				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(date_sub(CURRENT_TIMESTAMP, interval 1 day), '%Y-%m-%d') " 
+				+ "AND remarks = 'REGULAR'");
+		query.params(analystId);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		if (resultSet.next()) {
+			return getResultSetEntity(resultSet);
+		} else {
+			return null;
+		}
+	}
+	
+	public Entity getLatestAttendance(Integer analystId) throws SQLException {
+		String sql = "SELECT * "
+				+ "FROM attendance "
+				+ "WHERE id = ( "
+				+ "SELECT max(id) "
+				+ "FROM attendance "
+				+ "WHERE analyst_id = ?1)";
+		Query query = new Query(sql);
+		query.params(analystId);
+		
+		ResultSet resultSet = executeQuery(query.getQuery());
+		if (resultSet.next()) {
+			return getResultSetEntity(resultSet);
+		} else {
+			return null;
+		}
 	}
 	
 	public Integer updateAnalystAttendance(Integer attendanceId) throws SQLException {
