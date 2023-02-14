@@ -18,6 +18,9 @@ public class AppServlet extends HttpServlet {
 	public void handleException(HttpServletRequest request, HttpServletResponse response,
 			Exception exception, boolean fromServlet) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
+		if (session == null) {
+			session = request.getSession();
+		}
 		session.setAttribute("error_message", exception.getMessage());
 		
 		if (fromServlet) {

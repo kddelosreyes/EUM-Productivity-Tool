@@ -8,6 +8,7 @@ import com.project.eum.prodtool.base.Entity;
 public class AnalystShiftSchedule extends Entity {
 
 	private Integer analystId;
+	private Analyst analyst;
 	private Integer shiftScheduleId;
 	private ShiftSchedule shiftSchedule;
 	private LocalDate fromDate;
@@ -23,6 +24,10 @@ public class AnalystShiftSchedule extends Entity {
 
 	public Integer getAnalystId() {
 		return analystId;
+	}
+	
+	public Analyst getAnalyst() {
+		return analyst;
 	}
 
 	public Integer getShiftScheduleId() {

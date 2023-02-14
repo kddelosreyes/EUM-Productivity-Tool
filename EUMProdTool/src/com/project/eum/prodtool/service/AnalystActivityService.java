@@ -145,5 +145,16 @@ public class AnalystActivityService extends Service {
 		ResultSet resultSet = executeQuery(query.getQuery());
 		return resultSet.next();
 	}
+	
+	public Integer updateActivityRemarks(Integer analystActivityId, String remarks) throws SQLException {
+		String sql = "UPDATE analyst_activity "
+				+ "SET remarks = ?1 "
+				+ "WHERE id = ?2";
+		Query query = new Query(sql);
+		query.params(remarks, analystActivityId);
+		
+		Integer affectedRows = executeUpdate(query.getQuery());
+		return affectedRows;
+	}
 
 }

@@ -13,17 +13,14 @@ public class T_AnalystShiftSchedule {
 	private LocalTime startTime;
 	private LocalTime endTime;
 	private LocalDate startDate;
-	private LocalDate endDate;
-	private String restDays;
 	private Boolean isNightShift;
+	private Integer analystShiftScheduleId;
 	
 	private String shift;
-	private String restDayString;
 	
 	public T_AnalystShiftSchedule(Integer analystId, String name, String role,
 			String shiftName, LocalTime startTime, LocalTime endTime,
-			LocalDate startDate, LocalDate endDate, String restDays,
-			Boolean isNightShift) {
+			LocalDate startDate, Boolean isNightShift, Integer analystShiftScheduleId) {
 		super();
 		this.analystId = analystId;
 		this.name = name;
@@ -32,8 +29,7 @@ public class T_AnalystShiftSchedule {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.startDate = startDate;
-		this.endDate = endDate;
-		this.restDays = restDays;
+		this.analystShiftScheduleId = analystShiftScheduleId;
 	}
 
 	public Integer getAnalystId() {
@@ -63,17 +59,13 @@ public class T_AnalystShiftSchedule {
 	public LocalDate getStartDate() {
 		return startDate;
 	}
-
-	public LocalDate getEndDate() {
-		return endDate;
-	}
-
-	public String getRestDays() {
-		return restDays;
-	}
 	
 	public Boolean getIsNightShift() {
 		return isNightShift;
+	}
+	
+	public Integer getAnalystShiftScheduleId() {
+		return analystShiftScheduleId;
 	}
 	
 	public String getShift() {
@@ -81,22 +73,6 @@ public class T_AnalystShiftSchedule {
 				+ endTime.format(DateTimeFormatter.ofPattern("hh:mm a"))+ ")";
 		
 		return shift;
-	}
-	
-	public String getRestDayString() {
-		restDayString = restDays == null ? "" : restDays;
-		
-		restDays = restDayString.replaceAll("Su", "Sunday")
-						.replaceAll("M", "Monday")
-						.replaceAll("Tu", "Tuesday")
-						.replaceAll("W", "Wednesday")
-						.replaceAll("Th", "Thursday")
-						.replaceAll("F", "Friday")
-						.replaceAll("Sa", "Saturday");
-		
-		return restDays;
-	}
-	
-	
+	}	
 	
 }

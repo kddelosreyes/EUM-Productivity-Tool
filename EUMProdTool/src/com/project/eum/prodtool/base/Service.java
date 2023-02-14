@@ -20,7 +20,7 @@ public abstract class Service {
     private static final String SERVER = "localhost";
     private static final String PORT = "3306";
 	
-	private static final String URL = "jdbc:mysql://" + SERVER + ":" + PORT + "/" + DATABASE;
+	private static final String URL = "jdbc:mysql://" + SERVER + ":" + PORT + "/" + DATABASE + "?autoreconnect=true";
 	
 	private static Connection connection = null;
 	

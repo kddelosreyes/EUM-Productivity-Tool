@@ -37,6 +37,7 @@
 	<main class="flex-shrink-0">
 		<br>
 		<div class="container">
+			<c:if test="${not empty attendance }">		
 			<div class="row">				
 				<div class="col"></div>
 				<div class="col-9">
@@ -64,8 +65,7 @@
 										</c:otherwise>
 									</c:choose>
 									<c:if test="${(empty attendance.timeOut) and not (has_pending)}">
-										<input type="hidden" name="attendance_id" value="${attendance.id}" />
-										<button type="submit" class="btn btn-outline-danger" name="command" value="TIME_OUT">
+										<button type="button" class="btn btn-outline-danger" name="command" value="TIME_OUT" data-bs-toggle="modal" data-bs-target="#clock_out_modal">
 											<i class="bi bi-hourglass-bottom"></i> Clock Out
 										</button>
 									</c:if>
@@ -258,7 +258,55 @@
 				</div>
 				<div class="col"></div>
 			</div>
+			</c:if>
+			<c:if test="${empty attendance }">
+			<div class="row">				
+				<div class="col"></div>
+				<div class="col-9">
+					<div class="card">
+						<h5 class="card-header"><b>Clock In</b></h5>
+						<div class="card-body d-flex justify-content-between">
+							<form action="<%=request.getContextPath()%>/home" method="post">
+								<input type="hidden" name="analyst_id" value="${analyst.id}" />
+								<div class="input-group">
+									<button type="submit" class="btn btn-outline-success" name="command" value="TIME_IN">
+										<i class="bi bi-hourglass-bottom"></i> Clock In
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="col"></div>
+			</div>
+			</c:if>
 			<br>
+		</div>
+	
+		<div class="modal fade" id="clock_out_modal" tabindex="-1" aria-labelledby="clock_out_modalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">Clock Out</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="clock_out_form" action="<%=request.getContextPath()%>/home" method="post">
+							<input type="hidden" name="command" value="TIME_OUT" />
+							<input type="hidden" name="attendance_id" value="${attendance.id}" />
+							<div class="form-floating mb-3">
+								Are you sure you want to proceed?
+								<br><br><br>
+								<i class="bi bi-exclamation-triangle"></i> Warning! You will not be able to start any activity once you clocked out.
+							</div>
+							<div class="form-floating mb-3">
+								<button type="submit" class="btn btn-primary" id="proceed_clock_out" value="SAVE"><i class="bi bi-check-lg"></i> Proceed</button>
+								<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cancel</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 	<main>
 
@@ -301,12 +349,7 @@
 				success : function(responseText) {
 					console.log("Response Text: " + responseText);
 					if (responseText === 'SUCCESS') {
-						<%
-							String server = (String) session.getAttribute("server");
-						%>
-						
-						var server = '<%= server %>';
-						window.location.href = "http://" + server + ":8080/EUMProdTool/home";
+						window.location.href = "${pageContext.request.contextPath}/home";
 					}
 			    }
 			});

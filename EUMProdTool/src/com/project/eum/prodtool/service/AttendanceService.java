@@ -74,7 +74,8 @@ public class AttendanceService extends Service {
 		Query query = new Query("SELECT * "
 				+ "FROM attendance "
 				+ "WHERE analyst_id = ?1 "
-				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP, '%Y-%m-%d') ");
+				+ "AND date_format(time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP, '%Y-%m-%d') "
+				+ "AND remarks = 'REGULAR'");
 		query.params(analystId);
 		
 		ResultSet resultSet = executeQuery(query.getQuery());
@@ -133,7 +134,8 @@ public class AttendanceService extends Service {
 				+ "WHERE id = ( "
 				+ "SELECT max(id) "
 				+ "FROM attendance "
-				+ "WHERE analyst_id = ?1)";
+				+ "WHERE analyst_id = ?1) "
+				+ "AND remarks = 'REGULAR'";
 		Query query = new Query(sql);
 		query.params(analystId);
 		
@@ -200,21 +202,21 @@ public class AttendanceService extends Service {
 				+ "JOIN shift_schedule ss ON ss.id = ass.shift_schedule_id "
 				+ "WHERE date_format(a.time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') " 
 				+ "AND time(a.time_in) <= ss.start_time "
-				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') BETWEEN ass.from_date AND ass.to_date) as 'ON_TIME', "
+				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') = ass.from_date) as 'ON_TIME', "
 				+ "(SELECT count(*) FROM attendance a "
 				+ "JOIN analyst an ON an.id = a.analyst_id " 
 				+ "JOIN analyst_shift_schedule ass ON an.id = ass.analyst_id " 
 				+ "JOIN shift_schedule ss ON ss.id = ass.shift_schedule_id "
 				+ "WHERE date_format(a.time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') " 
 				+ "AND time(a.time_in) > ss.start_time AND time(a.time_in) <= ss.end_time "
-				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') BETWEEN ass.from_date AND ass.to_date) as 'LATE', "
+				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') = ass.from_date) as 'LATE', "
 				+ "(SELECT count(*) FROM attendance a "
 				+ "JOIN analyst an ON an.id = a.analyst_id " 
 				+ "JOIN analyst_shift_schedule ass ON an.id = ass.analyst_id " 
 				+ "JOIN shift_schedule ss ON ss.id = ass.shift_schedule_id "
 				+ "WHERE date_format(a.time_in, '%Y-%m-%d') = date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') " 
 				+ "AND time(a.time_in) > ss.end_time "
-				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') BETWEEN ass.from_date AND ass.to_date) as 'OUT_OF_SCHEDULE'";
+				+ "AND date_format(CURRENT_TIMESTAMP(), '%Y-%m-%d') = ass.from_date) as 'OUT_OF_SCHEDULE'";
 		
 		Query query = new Query(sqlQuery);
 		

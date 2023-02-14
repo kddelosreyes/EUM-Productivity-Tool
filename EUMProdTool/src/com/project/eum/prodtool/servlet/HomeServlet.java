@@ -2,8 +2,8 @@ package com.project.eum.prodtool.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,15 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.model.Activity;
 import com.project.eum.prodtool.model.Analyst;
 import com.project.eum.prodtool.model.AnalystActivity;
-import com.project.eum.prodtool.model.AnalystActivityFieldDetail;
 import com.project.eum.prodtool.model.Attendance;
 import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.add.TimeSummary;
-import com.project.eum.prodtool.model.field.AnalystActivityField;
 import com.project.eum.prodtool.model.field.AnalystField;
 import com.project.eum.prodtool.service.ActivityService;
 import com.project.eum.prodtool.service.AnalystActivityFieldDetailService;
@@ -90,6 +87,9 @@ public class HomeServlet extends HttpServlet {
 			case "VIEW_ACTIVITY":
 				viewActivity(request, response);
 				break;
+			case "TIME_IN":
+				timeIn(request, response);
+				break;
 			case "TIME_OUT":
 				timeOut(request, response);
 				break;
@@ -136,86 +136,72 @@ public class HomeServlet extends HttpServlet {
 						if (attendanceService.hasAttendanceForYesterdayNoOut(analystId)) {
 							attendance = (Attendance) attendanceService.getAttendanceForYesterday(analystId);
 						} else if (attendanceService.hasAttendanceForYesterday(analystId)) {
-							attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);							
+							attendance = (Attendance) attendanceService.getAttendanceForYesterday(analystId);	
+							
+							if (LocalTime.now().isAfter(shiftSchedule.getEndTime())) {
+								attendance = null;
+							}
 						}
 					} else {
 						attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);
 					}
 					
 					if (attendance == null) {
-						attendance = (Attendance) attendanceService.getLatestAttendance(analystId);
+						attendance = (Attendance) attendanceService.getAttendanceForToday(analystId);
 					}
 					
-					List<Activity> activities = activityService.getActivitiesByAnalystId((Integer) analyst.get(AnalystField.ID));
-					request.setAttribute("activities", activities);
-					
-					List<AnalystActivity> analystActivities = null;
-					
-					if (shiftSchedule.getIsNightShift()) {
-						analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId, attendance.getTimeIn(), attendance.getTimeOut());
-					} else {
-						analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
-					}
-					
-					if (!analystActivities.isEmpty()) {
-						List<Integer> ids = analystActivities.stream()
-								.map(a -> a.getId())
-								.collect(Collectors.toList());
-						String inIds = ids.stream()
-								.map(a -> Integer.toString(a))
-								.collect(Collectors.joining(","));
+					if (attendance != null) {
+						List<Activity> activities = activityService.getActivitiesByAnalystId((Integer) analyst.get(AnalystField.ID));
+						request.setAttribute("activities", activities);
 						
-						List<Entity> fieldDetails = analystActivityFieldDetailService.getRemarksFromAnalystActivityIds(inIds);
+						List<AnalystActivity> analystActivities = null;
 						
-						for (AnalystActivity analystActivity : analystActivities) {
-							AnalystActivityFieldDetail fieldDetail = (AnalystActivityFieldDetail) fieldDetails.stream()
-									.filter(a -> ((AnalystActivityFieldDetail)a).getAnalystActivityId() == analystActivity.getId())
-									.findAny()
-									.orElse(null);
-							
-							if (fieldDetail != null) {
-								analystActivity.set(AnalystActivityField.remarks, fieldDetail.getValue());
-							}
+						if (shiftSchedule.getIsNightShift()) {
+							analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId, attendance.getTimeIn(), attendance.getTimeOut());
+						} else {
+							analystActivities = analystActivityService.getTodaysActivitiesByAnalystId(analystId);
 						}
+						
+						Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
+						
+						long totalWorkingMinutes = analystActivities.stream()
+								.mapToLong(a -> a.getMinutes()).sum();
+						
+						long totalProductiveMinutes = analystActivities.stream()
+								.filter(a -> a.getActivity().getActivityTypeId() == 1)
+								.mapToLong(a -> a.getMinutes()).sum();
+						
+						long totalNeutralMinutes = analystActivities.stream()
+								.filter(a -> a.getActivity().getActivityTypeId() == 2)
+								.mapToLong(a -> a.getMinutes()).sum();
+						
+						long totalNonProductiveMinutes = analystActivities.stream()
+								.filter(a -> a.getActivity().getActivityTypeId() == 3)
+								.mapToLong(a -> a.getMinutes()).sum();
+						
+						TimeSummary timeSummary = new TimeSummary();
+						timeSummary.setTotalWork(totalWorkingMinutes);
+						timeSummary.setTotalProductive(totalProductiveMinutes);
+						timeSummary.setTotalNeutral(totalNeutralMinutes);
+						timeSummary.setTotalNonProductive(totalNonProductiveMinutes);
+						
+						AnalystActivity analystActivity = analystActivities
+								.stream()
+								.filter(a -> a.getEndTime() == null)
+								.findAny()
+								.orElse(null);
+						
+						boolean hasPending = analystActivity != null;
+						
+						request.setAttribute("analyst_activities", analystActivities);
+						request.setAttribute("is_any_pending", isAnyPending);
+						request.setAttribute("time_summary", timeSummary);
+						request.setAttribute("attendance", attendance);
+						request.setAttribute("has_pending", hasPending);
+						request.setAttribute("shift_schedule", shiftSchedule);
+					} else {
+						request.setAttribute("attendance", attendance);
 					}
-					
-					Boolean isAnyPending = analystActivityService.isAnyPendingActivityByAnalystId(analystId);
-					
-					long totalWorkingMinutes = analystActivities.stream()
-							.mapToLong(a -> a.getMinutes()).sum();
-					
-					long totalProductiveMinutes = analystActivities.stream()
-							.filter(a -> a.getActivity().getActivityTypeId() == 1)
-							.mapToLong(a -> a.getMinutes()).sum();
-					
-					long totalNeutralMinutes = analystActivities.stream()
-							.filter(a -> a.getActivity().getActivityTypeId() == 2)
-							.mapToLong(a -> a.getMinutes()).sum();
-					
-					long totalNonProductiveMinutes = analystActivities.stream()
-							.filter(a -> a.getActivity().getActivityTypeId() == 3)
-							.mapToLong(a -> a.getMinutes()).sum();
-					
-					TimeSummary timeSummary = new TimeSummary();
-					timeSummary.setTotalWork(totalWorkingMinutes);
-					timeSummary.setTotalProductive(totalProductiveMinutes);
-					timeSummary.setTotalNeutral(totalNeutralMinutes);
-					timeSummary.setTotalNonProductive(totalNonProductiveMinutes);
-					
-					AnalystActivity analystActivity = analystActivities
-							.stream()
-							.filter(a -> a.getEndTime() == null)
-							.findAny()
-							.orElse(null);
-					
-					boolean hasPending = analystActivity != null;
-					
-					request.setAttribute("analyst_activities", analystActivities);
-					request.setAttribute("is_any_pending", isAnyPending);
-					request.setAttribute("time_summary", timeSummary);
-					request.setAttribute("attendance", attendance);
-					request.setAttribute("has_pending", hasPending);
-					request.setAttribute("shift_schedule", shiftSchedule);
 					
 					RequestDispatcher dispatcher = request.getRequestDispatcher("common/views/home.jsp");
 					dispatcher.forward(request, response);
@@ -268,6 +254,23 @@ public class HomeServlet extends HttpServlet {
 		
 		try {
 			int affectedRows = attendanceService.updateAnalystAttendance(attendanceId);
+			
+			if (affectedRows == 0) {
+				throw new SQLException("Affected rows = 0");
+			} else {
+				System.out.println("Affected Rows: " + affectedRows);
+				response.sendRedirect(request.getContextPath() + "/home");
+			}
+		} catch (SQLException exc) {
+			exc.printStackTrace();
+		}
+	}
+	
+	protected void timeIn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Integer analystId = Integer.parseInt(request.getParameter("analyst_id"));
+		
+		try {
+			int affectedRows = attendanceService.insertNewAttendanceForAnalystId(analystId);
 			
 			if (affectedRows == 0) {
 				throw new SQLException("Affected rows = 0");

@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="common/css/styles.css">
 <link rel="stylesheet" href="common/css/sticky-footer-navbar.css">
 <link rel="stylesheet" href="common/css/jquery-ui.css">
+<link rel="stylesheet" href="common/css/jquery-ui.multidatespicker.css">
 <link rel="stylesheet" href="common/css/bootstrap-icons.css">
 </head>
 <body onload=displayClock(); class="d-flex flex-column h-100 bg-purple">
@@ -186,6 +187,7 @@
 	<script src="common/js/dataTables.bootstrap5.min.js"></script>
 	<script src="common/js/jquery.dataTables.min.js"></script>
 	<script src="common/js/jquery-ui.js"></script>
+	<script src="common/js/jquery-ui.multidatespicker.js"></script>
 	<script src="common/js/moment.js"></script>
 	
 	<script>
@@ -203,7 +205,6 @@
 				String lastPage = (String) session.getAttribute("last_page");
 				String message = (session.getAttribute("message") == null ? "" : (String) session.getAttribute("message"));
 				String errorMessage = (session.getAttribute("error_message") == null ? "" : (String) session.getAttribute("error_message"));
-				String server = (String) session.getAttribute("server");
 			%>
 			
 			var jsLastPage = '<%= lastPage %>';
@@ -286,11 +287,10 @@
 							email : emailField.val()
 						},
 						success : function(responseText) {
-							var server = '<%= server %>';
 							if (responseText) {
-								window.location.href = "http://" + server + ":8080/EUMProdTool/manage";
+								window.location.href = "${pageContext.request.contextPath}/manage";
 							} else {
-								window.location.href = "http://" + server + ":8080/EUMProdTool/error";
+								window.location.href = "${pageContext.request.contextPath}/error";
 							}
 				        }
 					});
@@ -377,12 +377,12 @@
 			/*
 			 *	Shift Schedules
 			 */
-			 $('#shift_schedules_table').DataTable({
-				 "ordering" : false,
-				 autoWidth : true
-			 });
+			$('#shift_schedules_table').DataTable({
+				"ordering" : false,
+				autoWidth : true
+			});
 			
-			$('#analyst_shift_schedules_table').DataTable({
+			var analystShiftScheduleTable = $('#analyst_shift_schedules_table').DataTable({
 				"ordering" : false,
 				 autoWidth : true
 			});
@@ -410,27 +410,76 @@
 				}
 			}
 			
-			$('#analyst_shift_schedule_start_date').datepicker();
-			$('#analyst_shift_schedule_start_date').change(function() {
-				var startDate = $('#analyst_shift_schedule_start_date');
-				var endDate = $('#analyst_shift_schedule_end_date');
-				if (endDate.val()) {
-					var startDateStr = startDate.val();
-					var endDateStr = endDate.val();
-					
-					var dateStart = new Date(startDateStr);
-					var dateEnd = new Date(endDateStr);
-					
-					console.log(dateStart + " " + dateEnd);
-					
-					if (dateStart > dateEnd) {
-						$("#save_analyst_shift_schedule").prop('disabled', true);
-						addClass(startDate, "is-invalid");
-						addClass(endDate, "is-invalid");
-					} else {
-						$("#save_analyst_shift_schedule").prop('disabled', false);
-						removeClass(startDate, "is-invalid");
-						removeClass(endDate, "is-invalid");
+			var data = {
+					values : ${analyst_shift_schedlues_gson}
+			};
+			
+			console.log(data.values);
+			
+			$('#analyst_shift_schedule_start_date').multiDatesPicker({
+				minDate : 0
+			});
+			$('#analyst_shift_schedule_start_date').keypress(function (evt) {
+				return isNumeric(evt);
+			});
+			
+			$('#shift_schedules').multiDatesPicker({
+				numberOfMonths: [2,2],
+				defaultDate: new Date()
+			});
+			
+			$('#analyst_shift_schedule_analyst').change(function() {
+				var analyst_id = this.value;
+				var dates = [];
+				data.values.forEach(function(item) {
+					if (item.analystId == analyst_id) {
+						var fromDate = item.fromDate;
+						dates.push(new Date(fromDate.year, fromDate.month - 1, fromDate.day));
+					}
+				});
+				$('#analyst_shift_schedule_start_date').multiDatesPicker('resetDates', 'disabled');
+				$('#analyst_shift_schedule_start_date').multiDatesPicker('resetDates', 'picked');
+				if (Array.isArray(dates) && dates.length) {
+					$('#analyst_shift_schedule_start_date').multiDatesPicker({
+						addDisabledDates : dates
+					});
+				}
+			});
+			
+			$('#analyst_shift_schedule_analyst_selector').change(function() {
+				var analyst_id = this.value;
+				analystShiftScheduleTable.clear().draw();
+				if (analyst_id == -1) {
+					$('#shift_schedules').multiDatesPicker('resetDates', 'disabled');
+					$('#shift_schedules').multiDatesPicker('resetDates', 'picked');
+				} else {
+					var dates = [];
+					var counter = 1;
+					data.values.forEach(function(item) {
+						if (item.analystId == analyst_id) {
+							console.log(item);
+							var fromDate = item.fromDate;
+							dates.push(new Date(fromDate.year, fromDate.month - 1, fromDate.day));
+							
+							analystShiftScheduleTable
+								.row
+								.add([
+									counter,
+									item.analyst.firstName + " " + item.analyst.lastName,
+									item.fromDate.year + "-" + String("0" + item.fromDate.month).slice(-2) + "-" + ("0" + item.fromDate.day.toString()).slice(-2),
+									item.shiftSchedule.name,
+									'<a href="${pageContext.request.contextPath}/manage?command=EDIT_SHIFT_SCHEDULE&analyst_shift_schedule_id=' + item.id + '" class="btn btn-outline-success btn-sm" role="button" aria-pressed="true"><i class="bi bi-pencil"></i></a>'
+								])
+								.draw(false);
+							counter++;
+						}
+					});
+					$('#shift_schedules').multiDatesPicker('resetDates', 'disabled');
+					$('#shift_schedules').multiDatesPicker('resetDates', 'picked');
+					if (Array.isArray(dates) && dates.length) {
+						$('#shift_schedules').multiDatesPicker({
+							addDates : dates
+						});
 					}
 				}
 			});
@@ -458,13 +507,6 @@
 						removeClass(endDate, "is-invalid");
 					}
 				}
-			});
-			
-			$('input[type=checkbox]').on('change', function (e) {
-			    if ($('input[type=checkbox]:checked').length > 2) {
-			        $(this).prop('checked', false);
-			        alert("allowed only 3");
-			    }
 			});
 			
 			/*
@@ -528,11 +570,10 @@
 						report_end_date		: $("#report_end_date").val()
 					},
 					success : function(responseText) {
-						var server = '<%= server %>';
 						if (responseText) {
-							window.location.href = "http://" + server + ":8080/EUMProdTool/manage";
+							window.location.href = "${pageContext.request.contextPath}/manage";
 						} else {
-							window.location.href = "http://" + server + ":8080/EUMProdTool/error";
+							window.location.href = "${pageContext.request.contextPath}/error";
 						}
 			        }
 				});

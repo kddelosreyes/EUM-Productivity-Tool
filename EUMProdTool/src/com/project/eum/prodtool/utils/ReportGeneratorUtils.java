@@ -598,6 +598,48 @@ public class ReportGeneratorUtils {
 		}
 	}
 	
+	public static void generateReportFile(List<String> output, String fileName,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("output");
+		
+		int rowNum = 0;
+		for (String line : output) {
+			Row row = sheet.createRow(rowNum++);
+			String[] values = line.split(",");
+			int cellNum = 0;
+			for (String value : values) {
+				Cell cell = row.createCell(cellNum++);
+				cell.setCellValue(value);
+				
+				CellStyle cellStyle = cell.getSheet().getWorkbook().createCellStyle();
+				cellStyle.setWrapText(true);
+				cell.setCellStyle(cellStyle);
+			}
+		}
+		
+		int numberOfColumns = sheet.getRow(0).getLastCellNum();
+		for (int column = 0; column < numberOfColumns; column++) {
+			sheet.autoSizeColumn(column);
+		}
+		
+		try {
+			ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+			workbook.write(outByteStream);
+			byte[] outArray = outByteStream.toByteArray();
+			response.setContentType("application/ms-excel");
+			response.setContentLength(outArray.length); 
+			response.setHeader("Expires:", "0");
+			response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+			
+			OutputStream outStream = response.getOutputStream();
+			outStream.write(outArray);
+			outStream.flush();
+		} finally {
+			workbook.close();
+		}
+	}
+	
 	private static class ReportQuery {
 		private int id;
 		private String query;

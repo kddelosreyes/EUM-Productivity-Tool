@@ -13,11 +13,16 @@
 				<div class="col">
 					<h5><b>Analysts</b></h5>
 				</div>
-				<div class="col">
-					<button type="button" class="btn btn-primary create-new-analyst" data-bs-toggle="modal" data-bs-target="#create_new_analyst"
-						style="position: absolute; right: 16px;">
-						<i class="bi bi-plus-lg"></i> New
-					</button>
+				<div class="col text-end">
+					<form action="<%=request.getContextPath()%>/manage" method="post">
+						<input type="hidden" name="command" value="DOWNLOAD_ANALYSTS" />
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-download"></i> Download
+						</button>
+						<button type="button" class="btn btn-primary create-new-analyst" data-bs-toggle="modal" data-bs-target="#create_new_analyst">
+							<i class="bi bi-plus-lg"></i> New
+						</button>
+					</form>
 				</div>
 			</div>
 			<br>
@@ -60,7 +65,7 @@
 										</c:if>
 									</td>
 									<td>
-										<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>
+										<!--<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>-->
 										<c:if test="${analyst.isActive}">
 											<a href="${deactivate_analyst}" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
 										</c:if>

@@ -190,15 +190,10 @@
 	
 	<script>
 		$(function() {
-			<%
-				String server = (String) session.getAttribute("server");
-			%>
-			
 			$( "#date" ).datepicker();
 			
 			$('#back').click(function() {
-				var server = '<%= server %>';
-				window.location.href = "http://" + server + ":8080/EUMProdTool/home";
+				window.location.href = "${pageContext.request.contextPath}/home";
 			});
 		});
 	</script>

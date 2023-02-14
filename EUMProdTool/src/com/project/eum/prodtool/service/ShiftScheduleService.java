@@ -51,7 +51,7 @@ public class ShiftScheduleService extends Service {
 				+ "ON ass.shift_schedule_id = ss.id "
 				+ "JOIN analyst a "
 				+ "ON a.id = ass.analyst_id "
-				+ "WHERE current_date() BETWEEN from_date AND to_date "
+				+ "WHERE current_date() = from_date "
 				+ "AND a.id = ?1");
 		query.params(analystId);
 		

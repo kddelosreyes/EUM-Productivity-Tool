@@ -14,9 +14,15 @@
 					<h5><b>Shift Schedules</b></h5>
 				</div>
 				<div class="col text-end">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create_shift_schedule">
-						<i class="bi bi-plus-lg"></i> New
-					</button>
+					<form action="<%=request.getContextPath()%>/manage" method="post">
+						<input type="hidden" name="command" value="DOWNLOAD_SHIFT_SCHEDULE" />
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-download"></i> Download
+						</button>
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create_shift_schedule">
+							<i class="bi bi-plus-lg"></i> New
+						</button>
+					</form>
 				</div>
 			</div>
 			<br>
@@ -77,53 +83,48 @@
 			</div>
 			<br>
 			<div class="row">
-				<div class="col-12">
+				<div class="col-md-auto">
+					<div class="form-floating mb-3">
+						<select	class="form-select" id="analyst_shift_schedule_analyst_selector" 
+							name="analyst_shift_schedule_analyst_selector" style="display: inline">
+							<option value="-1"></option>
+							<c:forEach items="${active_analysts}" var="analyst">
+								<option value="${analyst.id}">${analyst.firstName} ${analyst.lastName}</option>
+							</c:forEach>
+						</select>
+						<label for="analyst_shift_schedule_analyst_selector">Analyst</label>
+					</div>
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-md-auto">
+					<div class="row mb-3">
+						<h6><strong>Shift Calendar</strong></h6>
+					</div>
+					<div id="shift_schedules"></div>
+				</div>
+				<div class="col">
 					<table id="analyst_shift_schedules_table" class="table table-striped nowrap">
 						<thead>
 							<tr>
 								<th>#</th>
 								<th>Name</th>
-								<th>Role</th>
+								<th>Date</th>
 								<th>Shift Schedule</th>
-								<th>NS?</th>
-								<th>Start Date</th>
-								<th>End Date</th>
-								<th>Rest Days</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
-							<c:set var="count" scope="page" value="${1}"/>
-							<c:forEach items="${analyst_shift_schedules}" var="analystShiftSchedule">
-								<tr>
-									<td>${count}</td>
-									<td>${analystShiftSchedule.name}</td>
-									<td>${analystShiftSchedule.role}</td>
-									<td>${analystShiftSchedule.shift}</td>
-									<td>
-										<c:if test="${analystShiftSchedule.isNightShift}">
-											Yes
-										</c:if>
-										<c:if test="${not analyst.isActive}">
-											No
-										</c:if>
-									</td>
-									<td>${analystShiftSchedule.startDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd"))}</td>
-									<td>${analystShiftSchedule.endDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd"))}</td>
-									<td>${analystShiftSchedule.restDayString}</td>
-								</tr>
-								<c:set var="count" value="${count + 1}" scope="page"/>
-							</c:forEach>
+							
 						</tbody>
 						<tfoot>
 							<tr>
 								<th>#</th>
 								<th>Name</th>
-								<th>Role</th>
+								<th>Date</th>
 								<th>Shift Schedule</th>
-								<th>NS?</th>
-								<th>Start Date</th>
-								<th>End Date</th>
-								<th>Rest Days</th>
+								<th>Actions</th>
 							</tr>
 						</tfoot>
 					</table>
@@ -204,6 +205,7 @@
 								<div class="form-floating mb-3">
 									<select	class="form-select" id="analyst_shift_schedule_analyst" 
 										name="analyst_shift_schedule_analyst" style="display: inline">
+										<option value="-1"></option>
 										<c:forEach items="${active_analysts}" var="analyst">
 											<option value="${analyst.id}">${analyst.firstName} ${analyst.lastName}</option>
 										</c:forEach>
@@ -213,6 +215,7 @@
 								<div class="form-floating mb-3">
 									<select	class="form-select" id="analyst_shift_schedule_shift" 
 										name="analyst_shift_schedule_shift" style="display: inline">
+										<option value="-1"></option>
 										<c:forEach items="${shift_schedules}" var="shiftSchedule">
 											<option value="${shiftSchedule.id}">${shiftSchedule.name} (${shiftSchedule.startTime} - ${shiftSchedule.endTime})</option>
 										</c:forEach>
@@ -226,39 +229,6 @@
 												name="analyst_shift_schedule_start_date" placeholder="Start Date" required/>
 											<label for="analyst_shift_schedule_start_date">Start Date</label>
 										</div>
-									</div>
-									<div class="col">
-										<div class="form-floating mb-3">
-											<input type="text" class="form-control" id="analyst_shift_schedule_end_date"
-												name="analyst_shift_schedule_end_date" placeholder="End Date" required/>
-											<label for="analyst_shift_schedule_end_date">End Date</label>
-										</div>
-									</div>
-								</div>
-								<div class="form-floating mb-3">
-									<small>Rest Days</small>
-									<br>
-									<div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-										<input type="checkbox" class="btn-check" id="btnSunday" name="analyst_shift_schedule_rest_day" value="Su" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnSunday">Sun</label>
-										
-										<input type="checkbox" class="btn-check" id="btnMonday" name="analyst_shift_schedule_rest_day" value="M" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnMonday">Mon</label>
-										
-										<input type="checkbox" class="btn-check" id="btnTuesday" name="analyst_shift_schedule_rest_day" value="Tu" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnTuesday">Tue</label>
-										
-										<input type="checkbox" class="btn-check" id="btnWednesday" name="analyst_shift_schedule_rest_day" value="W" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnWednesday">Wed</label>
-										
-										<input type="checkbox" class="btn-check" id="btnThursday" name="analyst_shift_schedule_rest_day" value="Th" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnThursday">Thu</label>
-										
-										<input type="checkbox" class="btn-check" id="btnFriday" name="analyst_shift_schedule_rest_day" value="F" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnFriday">Fri</label>
-										
-										<input type="checkbox" class="btn-check" id="btnSaturday" name="analyst_shift_schedule_rest_day" value="Sa" autocomplete="off">
-										<label class="btn btn-outline-success" for="btnSaturday">Sat</label>
 									</div>
 								</div>
 								<div class="form-floating mb-3">

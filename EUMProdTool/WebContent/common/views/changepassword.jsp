@@ -31,26 +31,7 @@
 </head>
 <body class="d-flex flex-column h-100 bg-purple">
 	<header>
-		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="<%=request.getContextPath()%>/home">EUM Productivity Tool</a>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-					data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
-					aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="collapse navbar-collapse" id="navbarCollapse">
-					<ul class="navbar-nav me-auto mb-2 mb-md-0">
-					</ul>
-					<c:url var="logout" value="login">
-						<c:param name="command" value="LOGOUT" />
-					</c:url>
-					<div class="btn-group d-flex">
-						<a href="${logout}" class="btn btn-primary" role="button" aria-pressed="true"><i class="bi bi-box-arrow-left"></i> Logout</a>
-					</div>
-				</div>
-			</div>
-		</nav>
+		<jsp:include page="header.jsp" />
 	</header>
 	<br>
 	<main>
@@ -219,10 +200,11 @@
 	    <jsp:include page="footer.jsp" />
 	</footer>
 	
-	<script src="common/js/bootstrap.bundle.min.js"></script>
-	<script src="common/js/bootstrap.min.js"></script>
 	<script src="common/js/jquery-3.5.1.js"></script>
 	<script src="common/js/popper.min.js"></script>
+	<script src="common/js/bootstrap.min.js"></script>
+	<script src="common/js/dataTables.bootstrap5.min.js"></script>
+	<script src="common/js/jquery.dataTables.min.js"></script>
 	
 	<script type="text/javascript">
 
@@ -269,9 +251,6 @@
 		}
 
 		$(document).ready(function() {
-			<%
-				String server = (String) session.getAttribute("server");
-			%>
 			var form = $('#login_form');
 			console.log($("#username").val());
 
@@ -349,8 +328,7 @@
 			});
 			
 			$('#back').click(function() {
-				var server = '<%= server %>';
-				window.location.href = "http://" + server + ":8080/EUMProdTool/home";
+				window.location.href = "${pageContext.request.contextPath}/home";
 			});
 
 			$("#confirm").click(function() {
@@ -370,6 +348,11 @@
 							$("#link").css("visibility", "hidden");
 							console.log("Response Text: " + responseText);
 							if (responseText === 'SUCCESS') {
+								<%
+									if (session != null) {
+										session.invalidate();
+									}
+								%>
 								$("#link").css("visibility", "visible");
 								$("#username").val('');
 								$("#password").val('');

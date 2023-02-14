@@ -15,11 +15,13 @@ public class TabDetails_ShiftSchedule {
 	
 	private List<Entity> shiftSchedules;
 	private List<T_AnalystShiftSchedule> analystShiftSchedules;
+	private List<Entity> analystShiftSchedulesJson;
 	
 	public TabDetails_ShiftSchedule() {
 		try {
 			shiftSchedules = shiftScheduleService.getAll();
 			analystShiftSchedules = analystShiftScheduleService.getAllShiftSchedulesForCurrentQuarter();
+			analystShiftSchedulesJson = analystShiftScheduleService.getAll();
 		} catch (SQLException exc) {
 			exc.printStackTrace();
 		}
@@ -31,6 +33,10 @@ public class TabDetails_ShiftSchedule {
 	
 	public List<T_AnalystShiftSchedule> getAnalystShiftSchedules() {
 		return analystShiftSchedules;
+	}
+	
+	public List<Entity> getAnalystShiftSchedulesJson() {
+		return analystShiftSchedulesJson;
 	}
 	
 }

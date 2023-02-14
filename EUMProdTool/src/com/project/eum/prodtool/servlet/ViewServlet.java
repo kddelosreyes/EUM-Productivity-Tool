@@ -167,12 +167,18 @@ public class ViewServlet extends HttpServlet {
 			}
 			
 			Map<Integer, String> fieldValues = new HashMap<Integer, String>();
+			
+			String remarksValue = "";
 			for (FormField field : fields) {
 				Integer fieldId = (Integer) field.get(FormFieldField.id);
 				String fieldType = (String) field.get(FormFieldField.type);
 				
 				String value = request.getParameter(analystActivityId + "_" + fieldId + "_" + fieldType);
 				fieldValues.put(fieldId, value);
+				
+				if (field.getName().equals("Remarks")) {
+					remarksValue = value; 
+				}
 			}
 			System.out.println(fieldValues);
 			
@@ -197,6 +203,7 @@ public class ViewServlet extends HttpServlet {
 			}
 			
 			if (isValid) {
+				analystActivityService.updateActivityRemarks(analystActivityId, remarksValue);
 				backAction(request, response);
 			}
 		} catch (SQLException exc) {

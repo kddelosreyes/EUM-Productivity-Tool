@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.project.eum.prodtool.base.Entity;
 import com.project.eum.prodtool.base.Service;
+import com.project.eum.prodtool.model.Analyst;
 import com.project.eum.prodtool.model.AnalystShiftSchedule;
 import com.project.eum.prodtool.model.ShiftSchedule;
 import com.project.eum.prodtool.model.add.T_AnalystShiftSchedule;
@@ -22,6 +23,7 @@ import com.project.eum.prodtool.utils.DateTimeUtils;
 
 public class AnalystShiftScheduleService extends Service {
 
+	private AnalystService analystService = new AnalystService();
 	private ShiftScheduleService shiftScheduleService = new ShiftScheduleService();
 	
 	@Override
@@ -35,16 +37,19 @@ public class AnalystShiftScheduleService extends Service {
 		Integer analystId = resultSet.getInt(AnalystShiftScheduleColumn.ANALYST_ID.getColumnName());
 		Integer shiftScheduleId = resultSet.getInt(AnalystShiftScheduleColumn.SHIFT_SCHEDULE_ID.getColumnName());
 		LocalDate fromDate = DateTimeUtils.convertDateToLocalDate(resultSet.getDate(AnalystShiftScheduleColumn.FROM_DATE.getColumnName()));
-		LocalDate toDate = DateTimeUtils.convertDateToLocalDate(resultSet.getDate(AnalystShiftScheduleColumn.TO_DATE.getColumnName()));
+		java.sql.Date toDateSql = resultSet.getDate(AnalystShiftScheduleColumn.TO_DATE.getColumnName());
+		LocalDate toDate = toDateSql == null ? null : DateTimeUtils.convertDateToLocalDate(toDateSql);
 		String restDays = resultSet.getString(AnalystShiftScheduleColumn.REST_DAYS.getColumnName());
 		LocalDateTime createdDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AnalystShiftScheduleColumn.CREATED_DATE.getColumnName()));
 		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp(AnalystShiftScheduleColumn.UPDATED_DATE.getColumnName()));
 		
+		Analyst analyst = (Analyst) analystService.getEntityById(analystId);
 		ShiftSchedule shiftSchedule = (ShiftSchedule) shiftScheduleService.getEntityById(shiftScheduleId);
 		
 		Entity entity = new AnalystShiftSchedule()
 				.set(AnalystShiftScheduleField.id, id)
 				.set(AnalystShiftScheduleField.analystId, analystId)
+				.set(AnalystShiftScheduleField.analyst, analyst)
 				.set(AnalystShiftScheduleField.shiftScheduleId, shiftScheduleId)
 				.set(AnalystShiftScheduleField.shiftSchedule, shiftSchedule)
 				.set(AnalystShiftScheduleField.fromDate, fromDate)
@@ -102,16 +107,15 @@ public class AnalystShiftScheduleService extends Service {
 		
 		String sql = "SELECT analyst_id, CONCAT(first_name, ' ', last_name) as 'analyst_name', role,"
 				+ "		ss.name, start_time, end_time,"
-				+ "		from_date, to_date, rest_days,"
-				+ "		ss.is_night_shift "
+				+ "		from_date, ss.is_night_shift, ass.id "
 				+ "FROM analyst_shift_schedule ass "
 				+ "		JOIN analyst a "
 				+ "			ON a.id = ass.analyst_id "
 				+ "		JOIN shift_schedule ss "
 				+ "			ON ss.id = ass.shift_schedule_id "
-				+ "WHERE quarter(from_date) = 1 "
-				+ "		OR quarter(from_date) = 1 "
-				+ "		AND year(from_date) = 2023 "
+				+ "WHERE quarter(from_date) = ?1 "
+				+ "		OR quarter(from_date) = ?2 "
+				+ "		AND year(from_date) = ?3 "
 				+ "		AND a.is_active = 1 "
 				+ "ORDER BY analyst_id, from_date";
 		Query query = new Query(sql);
@@ -127,16 +131,14 @@ public class AnalystShiftScheduleService extends Service {
 			LocalTime startTime = DateTimeUtils.convertTimeToLocalTime(resultSet.getTime("start_time"));
 			LocalTime endTime = DateTimeUtils.convertTimeToLocalTime(resultSet.getTime("end_time"));
 			LocalDate fromDate = DateTimeUtils.convertDateToLocalDate(resultSet.getDate("from_date"));
-			LocalDate toDate = DateTimeUtils.convertDateToLocalDate(resultSet.getDate("to_date"));
-			String restDays = resultSet.getString("rest_days");
 			Boolean isNightShift = resultSet.getInt("is_night_shift") == 1;
+			Integer analystShiftScheduleId = resultSet.getInt("id");
 			
 			shiftSchedules.add(
 					new T_AnalystShiftSchedule(
 							analystId, name, role, 
 							shiftName, startTime, endTime,
-							fromDate, toDate, restDays,
-							isNightShift
+							fromDate, isNightShift, analystShiftScheduleId
 							)
 					);
 		}
@@ -144,13 +146,23 @@ public class AnalystShiftScheduleService extends Service {
 		return shiftSchedules;
 	}
 	
-	public Integer insertNewAnalystShiftSchedule(Integer analystId, Integer shiftScheduleId, Date fromDate,
-			Date toDate, String[] restDays) throws SQLException {
-		String sql = "INSERT INTO " + getTableName() + " (analyst_id, shift_schedule_id, from_date, to_date, rest_days) "
-				+ "VALUES(?1, ?2, ?3, ?4, ?5)";
+	public Integer insertNewAnalystShiftSchedule(Integer analystId, Integer shiftScheduleId, Date fromDate) throws SQLException {
+		String sql = "INSERT INTO " + getTableName() + " (analyst_id, shift_schedule_id, from_date) "
+				+ "VALUES(?1, ?2, ?3)";
 		Query query = new Query(sql);
-		query.params(analystId, shiftScheduleId, DateTimeUtils.toSqlDateString(fromDate),
-				DateTimeUtils.toSqlDateString(toDate), String.join(",", restDays));
+		query.params(analystId, shiftScheduleId, DateTimeUtils.toSqlDateString(fromDate));
+		
+		Integer key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
+	public Integer saveAnalystShiftSchedule(Integer id, Integer shiftScheduleId) throws SQLException {
+		String sql = "UPDATE " + getTableName() 
+				+ " SET shift_schedule_id = ?1 "
+				+ "WHERE id = ?2";
+		
+		Query query = new Query(sql);
+		query.params(shiftScheduleId, id);
 		
 		Integer key = executeUpdate(query.getQuery());
 		return key;

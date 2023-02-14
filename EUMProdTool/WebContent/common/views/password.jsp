@@ -129,9 +129,6 @@
 		}
 
 		$(document).ready(function() {
-			<%
-				String server = (String) session.getAttribute("server");
-			%>
 			var form = $('#login_form');
 			console.log($("#username").val());
 
@@ -229,6 +226,11 @@
 							$("#link").css("visibility", "hidden");
 							console.log("Response Text: " + responseText);
 							if (responseText === 'SUCCESS') {
+								<%
+									if (session != null) {
+										session.invalidate();
+									}
+								%>
 								$("#link").css("visibility", "visible");
 								$("#username").val('');
 								$("#password").val('');
