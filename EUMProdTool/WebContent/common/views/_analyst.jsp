@@ -65,7 +65,7 @@
 										</c:if>
 									</td>
 									<td>
-										<!--<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>-->
+										<button type="button" class="btn btn-outline-success btn-sm edit_analyst" name="edit_analyst" role="button" aria-pressed="true" data-toggle="tooltip" title="Edit" data-bs-toggle="modal" data-bs-target="#create_new_analyst"><i class="bi bi-pencil"></i></button>
 										<c:if test="${analyst.isActive}">
 											<a href="${deactivate_analyst}" class="btn btn-outline-danger btn-sm" role="button" aria-pressed="true" data-toggle="tooltip" title="Deactivate"><i class="bi bi-lock"></i></a>
 										</c:if>
@@ -108,6 +108,8 @@
 						<div class="col-12">
 							<form id="activity_type_form" action="<%=request.getContextPath()%>/#" method="post">
 								<input type="hidden" name="command" value="CREATE_ANALYST" />
+								<input type="hidden" class="form-control" id="analyst_id"
+									name="analyst_id" required/>
 								<div class="form-floating mb-3">
 									<input type="text" class="form-control" id="analyst_first_name"
 										name="analyst_first_name" placeholder="First Name" required/>

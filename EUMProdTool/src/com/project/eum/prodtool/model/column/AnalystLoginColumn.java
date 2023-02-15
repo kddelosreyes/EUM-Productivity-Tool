@@ -13,6 +13,8 @@ public enum AnalystLoginColumn implements Column {
 	UPDATED_DATE,
 	IS_LOCKED,
 	ATTEMPT,
+	SECURITY_QUESTION,
+	SECURITY_ANSWER,
 	UUID;
 	
 	@Override

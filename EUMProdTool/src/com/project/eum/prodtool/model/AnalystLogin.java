@@ -14,6 +14,8 @@ public class AnalystLogin extends Entity {
 	private LocalDateTime updatedDate;
 	private Boolean isLocked;
 	private Integer attempt;
+	private Integer securityQuestion;
+	private String securityAnswer;
 	
 	public AnalystLogin() {
 		super();
@@ -73,6 +75,14 @@ public class AnalystLogin extends Entity {
 
 	public Integer getAttempt() {
 		return attempt;
+	}
+	
+	public Integer getSecurityQuestion() {
+		return securityQuestion;
+	}
+	
+	public String getSecurityAnswer() {
+		return securityAnswer;
 	}
 	
 }

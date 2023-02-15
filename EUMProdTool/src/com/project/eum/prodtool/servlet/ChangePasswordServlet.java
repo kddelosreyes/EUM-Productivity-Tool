@@ -109,6 +109,8 @@ public class ChangePasswordServlet extends HttpServlet {
 			username = username + "@indracompany.com";
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirm_password");
+			Integer securityQuestion = Integer.parseInt(request.getParameter("security_question"));
+			String securityAnswer = request.getParameter("security_answer");
 			
 			AnalystLogin analystLogin = null;
 			
@@ -120,17 +122,35 @@ public class ChangePasswordServlet extends HttpServlet {
 			
 			if (username.equalsIgnoreCase(analystLogin.getUsername())) {
 				if (password.equals(confirmPassword)) {
-					String salt = analystLogin.getSalt();
-					String newPassword = PasswordUtils.generateSecurePassword(password, salt);
 					try {
-						int affectedRows = analystLoginService.updateAnalystLoginPassword(analystLogin.getId(), newPassword);
-						if (affectedRows > 0) {
-							if (session != null && session.getAttribute("analyst_login") != null) {
-								session.invalidate();
+						String salt = analystLogin.getSalt();
+						String newPassword = PasswordUtils.generateSecurePassword(password, salt);
+						// Already changed password
+						if (analystLogin.getSecurityQuestion() != null && analystLogin.getSecurityAnswer() != null) {
+							if (analystLogin.getSecurityQuestion() != securityQuestion ||
+									!analystLogin.getSecurityAnswer().equals(securityAnswer)) {
+								response.getWriter().write("Security question and answer does not match!");
+							} else {
+								int affectedRows = analystLoginService.updateAnalystLoginPassword(analystLogin.getId(), newPassword);
+								if (affectedRows > 0) {
+									if (session != null && session.getAttribute("analyst_login") != null) {
+										session.invalidate();
+									}
+									response.getWriter().write("SUCCESS");
+								} else {
+									response.getWriter().write("There is an error on changing password. Please contact administrator.");
+								}
 							}
-							response.getWriter().write("SUCCESS");
 						} else {
-							response.getWriter().write("There is an error on changing password. Please contact administrator.");
+							int affectedRows = analystLoginService.updateAnalystLoginPassword(analystLogin.getId(), newPassword, securityQuestion, securityAnswer);
+							if (affectedRows > 0) {
+								if (session != null && session.getAttribute("analyst_login") != null) {
+									session.invalidate();
+								}
+								response.getWriter().write("SUCCESS");
+							} else {
+								response.getWriter().write("There is an error on changing password. Please contact administrator.");
+							}
 						}
 					} catch (SQLException exc) {
 						exc.printStackTrace();

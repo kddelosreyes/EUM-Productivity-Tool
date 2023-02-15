@@ -29,6 +29,8 @@ public class AnalystLoginService extends Service {
 		LocalDateTime updatedDate = DateTimeUtils.convertTimestampToLocalDateTime(resultSet.getTimestamp("updated_date"));
 		Boolean isLocked = resultSet.getInt("is_locked") == 1;
 		Integer attempt = resultSet.getInt("attempt");
+		Integer securityQuestion = resultSet.getInt("security_question");
+		String securityAnswer = resultSet.getString("security_answer");
 		String uuid = resultSet.getString("uuid");
 		
 		Entity entity = new AnalystLogin()
@@ -41,6 +43,8 @@ public class AnalystLoginService extends Service {
 				.set(AnalystLoginField.UPDATED_DATE, updatedDate)
 				.set(AnalystLoginField.IS_LOCKED, isLocked)
 				.set(AnalystLoginField.ATTEMPT, attempt)
+				.set(AnalystLoginField.SECURITY_QUESTION, securityQuestion)
+				.set(AnalystLoginField.SECURITY_ANSWER, securityAnswer)
 				.set(AnalystLoginField.UUID, uuid);
 		
 		return entity;
@@ -66,6 +70,21 @@ public class AnalystLoginService extends Service {
 		
 		Query query = new Query(sqlQuery);
 		query.params(password, 0, analystLoginId);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
+	public Integer updateAnalystLoginPassword(Integer analystLoginId, String password, Integer securityQuestion, String securityAnswer) throws SQLException {
+		String sqlQuery = "UPDATE " + getTableName() + " "
+				+ "SET password = ?1, "
+				+ "is_locked = ?2, "
+				+ "security_question = ?3, "
+				+ "security_answer = ?4 "
+				+ "WHERE id = ?5";
+		
+		Query query = new Query(sqlQuery);
+		query.params(password, 0, securityQuestion, securityAnswer, analystLoginId);
 		
 		int key = executeUpdate(query.getQuery());
 		return key;

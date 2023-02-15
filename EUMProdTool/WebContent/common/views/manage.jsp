@@ -299,10 +299,9 @@
 			
 	        $('#analysts_table').on('click', 'button.edit_analyst',function (ele) {
 	        	console.log('Clicked.');
-	            //the <tr> variable is use to set the parentNode from "ele
 	            var tr = ele.target.parentNode.parentNode.parentNode;
+	            console.log(tr);
 
-	            //I get the value from the cells (td) using the parentNode (var tr)
 	            var firstName = tr.cells[0].textContent;
 	            var middleInitial = tr.cells[1].textContent;
 	            var lastName = tr.cells[2].textContent;

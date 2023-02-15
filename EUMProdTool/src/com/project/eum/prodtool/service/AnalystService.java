@@ -64,6 +64,22 @@ public class AnalystService extends Service {
 		return key;
 	}
 	
+	public Integer updateAnalyst(String firstName, String middleName, String lastName,
+			String role, Integer analystId) throws SQLException {
+		String sqlQuery = "UPDATE " + getTableName()
+				+ "SET first_name = ?1, "
+				+ "middle_name = ?2, "
+				+ "last_name = ?3, "
+				+ "role = ?4 "
+				+ "WHERE id = ?5";
+		
+		Query query = new Query(sqlQuery);
+		query.params(firstName, middleName, lastName, role, analystId);
+		
+		int key = executeUpdate(query.getQuery());
+		return key;
+	}
+	
 	public Boolean hasTeam(Integer analystId) throws SQLException {
 		String sql = "SELECT count(*) FROM analyst_team ant JOIN analyst a ON a.id = ant.analyst_id where a.id = ?1";
 		

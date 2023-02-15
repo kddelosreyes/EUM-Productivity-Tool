@@ -15,7 +15,9 @@ public enum AnalystLoginField implements EntityField {
 	CREATED_DATE("createdDate", LocalDateTime.class),
 	UPDATED_DATE("updatedDate", LocalDateTime.class),
 	IS_LOCKED("isLocked", Boolean.class),
-	ATTEMPT("attempt", Integer.class);
+	ATTEMPT("attempt", Integer.class),
+	SECURITY_QUESTION("securityQuestion", Integer.class),
+	SECURITY_ANSWER("securityAnswer", String.class);
 	
 	private final String fieldName;
 	private final Class<?> dataType;

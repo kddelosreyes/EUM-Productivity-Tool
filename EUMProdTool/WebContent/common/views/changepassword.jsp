@@ -156,6 +156,35 @@
 								</div>
 								<div class="row">
 									<div class="col">
+									<div class="form-floating mb-3">
+										<select	class="form-select" id="security_question" name="security_question" style="display: inline">
+											<option value="1">In what city were you born?</option>
+											<option value="2">What is the name of your favorite pet?</option>
+											<option value="3">What is your mother's maiden name?</option>
+											<option value="4">What high school did you attend?</option>
+											<option value="5">What was the name of your elementary school?</option>
+											<option value="6">What was the make of your first car?</option>
+											<option value="7">What was your favorite food as a child?</option>
+											<option value="8">Where did you meet your spouse?</option>
+											<option value="9">What year was your father (or mother) born?</option>
+										</select>
+										<label for="security_question">Security Question</label>
+									</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+										<div class="form-floating mb-3">
+											<input type="text" class="form-control" name="security_answer"
+												id="security_answer" placeholder="Answer" required>
+											<label for="security_answer">Answer</label>
+										</div>
+									</div>
+									<div class="col">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
 										<div class="form-floating mb-3">
 											<input type="text" class="form-control" name="captcha"
 												id="captcha" placeholder="Code" disabled>
@@ -341,7 +370,9 @@
 							command : "CHANGE_PASSWORD",
 							username : $("#username").val(),
 							password : $("#password").val(),
-							confirm_password: $("#confirm_password").val(),
+							confirm_password : $("#confirm_password").val(),
+							security_question : $("#security_question").val(),
+							security_answer : $("#security_answer").val()
 						},
 						success : function(responseText) {
 							$("#feedback").css("visibility", "hidden");

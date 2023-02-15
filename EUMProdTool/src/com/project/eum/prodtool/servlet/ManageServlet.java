@@ -310,28 +310,41 @@ public class ManageServlet extends AppServlet {
 	
 	private void createAnalyst(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
+			String analystIdValue = request.getParameter("analyst_id");
 			String firstName = request.getParameter("first_name");
 			String middleName = request.getParameter("middle_name");
 			String lastName = request.getParameter("last_name");
 			String role = request.getParameter("role");
 			String email = request.getParameter("email");
 			
-			int analystId = analystService.insertNewAnalyst(firstName, middleName, lastName, role);
-			if (analystId > 0) {
-				String salt = PasswordUtils.getSaltvalue(36);
-				String password = PasswordUtils.generateSecurePassword(email, salt);
-				int returnedKey = analystLoginService.insertNewAnalystLogin(analystId, email, password, salt, 1, 0);
+			if (analystIdValue == null) {
+				int analystId = analystService.insertNewAnalyst(firstName, middleName, lastName, role);
+				if (analystId > 0) {
+					String salt = PasswordUtils.getSaltvalue(36);
+					String password = PasswordUtils.generateSecurePassword(email, salt);
+					int returnedKey = analystLoginService.insertNewAnalystLogin(analystId, email, password, salt, 1, 0);
+					
+					if (returnedKey > 0) {
+						HttpSession session = request.getSession(false);
+						session.setAttribute("last_page", "ANALYST");
+						session.setAttribute("message", "Successfully created a new analyst.");
+						
+						response.getWriter().write(Integer.toString(returnedKey));
+					} else {
+						throw new RuntimeException("There is an error on adding analyst.");
+					}
+				}
+			} else {
+				int analystId = Integer.parseInt(analystIdValue);
 				
-				if (returnedKey > 0) {
+				int affectedRows = analystService.updateAnalyst(firstName, middleName, lastName, role, analystId);
+				if (affectedRows > 0) {
 					HttpSession session = request.getSession(false);
 					session.setAttribute("last_page", "ANALYST");
 					session.setAttribute("message", "Successfully created a new analyst.");
-					
-					System.out.println("Created analyst and account.");
-					
-					response.getWriter().write(Integer.toString(returnedKey));
+					response.getWriter().write(Integer.toString(affectedRows));
 				} else {
-					throw new RuntimeException("There is an error on adding analyst.");
+					throw new RuntimeException("There is an error on updating analyst.");
 				}
 			}
 		} catch (Exception exception) {
@@ -716,19 +729,19 @@ public class ManageServlet extends AppServlet {
 					for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
 						Date currentDate = DateTimeUtils.convertLocalDateToDate(date);
 						if (currentShiftSchedules.isEmpty()) {
-							int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, fromDate);
+							int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, currentDate);
 							if (affectedRows > 0) {
 								totalAddedRecords++;
 							}
 						} else {				
 							AnalystShiftSchedule overlappingSchedule = (AnalystShiftSchedule) currentShiftSchedules
 									.stream()
-									.filter(a -> ((AnalystShiftSchedule) a).getFromDate().isEqual(DateTimeUtils.convertDateToLocalDate(fromDate)))
+									.filter(a -> ((AnalystShiftSchedule) a).getFromDate().isEqual(DateTimeUtils.convertDateToLocalDate(currentDate)))
 									.findAny()
 									.orElse(null);
 							
 							if (overlappingSchedule == null) {
-								int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, fromDate);
+								int affectedRows = analystShiftScheduleService.insertNewAnalystShiftSchedule(analystId, shiftScheduleId, currentDate);
 								if (affectedRows > 0) {
 									totalAddedRecords++;
 								}
